@@ -288,10 +288,7 @@ const DEFAULT_RADIUS = 15;
 
 class Game {
   constructor() {
-    this.humanPlayers = [];
-    this.computerPlayers = [];
-
-    this.addComputerPlayers(40);
+    this.players = [];
   }
 
   addPlayer(player) {
@@ -302,45 +299,6 @@ class Game {
     } else {
       throw "unknown type of player :(";
     }
-  }
-
-  addNewHumanPlayer(name) {
-    const humanPlayer = new __WEBPACK_IMPORTED_MODULE_0__human_player__["a" /* default */]({
-      pos: this.randomPos(),
-      game: this,
-      name: name
-    });
-
-    this.addPlayer(humanPlayer);
-    return humanPlayer;
-  }
-
-  addNewComputerPlayer() {
-    const computerPlayer = new __WEBPACK_IMPORTED_MODULE_1__computer_player__["a" /* default */]({
-      pos: this.randomPos(),
-      game: this,
-      velocity: __WEBPACK_IMPORTED_MODULE_2__util__["a" /* default */].randomVelocity(),
-      radius: __WEBPACK_IMPORTED_MODULE_2__util__["a" /* default */].randomRadius(),
-      name: __WEBPACK_IMPORTED_MODULE_2__util__["a" /* default */].randomPlayerName(),
-      color: "#293283"
-    });
-
-    this.addPlayer(computerPlayer);
-    return computerPlayer;
-  }
-
-  addComputerPlayers(n) {
-    for (let i = 0; i < n; i++) {
-      this.addNewComputerPlayer();
-    }
-  }
-
-  allPlayers() {
-    return [].concat(this.humanPlayers, this.computerPlayers);
-  }
-
-  humanPlayersInclude(player) {
-    return this.humanPlayers.includes(player);
   }
 
   draw(context, offset) {
@@ -363,72 +321,6 @@ class Game {
     context.strokeRect(offset[0], offset[1], Game.DIM_X, Game.DIM_Y);
     context.stroke();
   }
-
-  step(timeDelta) {
-    this.moveObjects(timeDelta);
-    this.checkCollisions();
-  }
-
-  moveObjects(timeDelta) {
-    this.allPlayers().forEach(player => {
-      if (player instanceof __WEBPACK_IMPORTED_MODULE_0__human_player__["a" /* default */]) {
-        player.velocity[0] *= 0.9;
-        player.velocity[1] *= 0.9;
-      }
-
-      player.move(timeDelta);
-    });
-  }
-
-  checkCollisions() {
-    const allPlayers = this.allPlayers();
-
-    for (let i = 0; i < allPlayers.length; i++) {
-      for (let j = i + 1; j < allPlayers.length; j++) {
-        const player1 = allPlayers[i];
-        const player2 = allPlayers[j];
-
-        if (player1.isCollidedWith(player2)) {
-          player1.handleCollision(player2);
-        }
-      }
-    }
-  }
-
-  outOfBounds(player) {
-    const pos = player.pos,
-      radius = player.radius;
-
-    return (pos[0] - radius < 0) || (pos[1] - radius < 0) ||
-      (pos[0] > Game.DIM_X - radius) || (pos[1] > Game.DIM_Y - radius);
-  }
-
-  outOfCanvasBounds(player, offset) {
-    const pos = player.pos,
-      radius = player.radius;
-
-    return (pos[0] + offset[0] + radius < 0 ||
-    pos[0] + offset[0] - radius > Game.CANVAS_X ||
-    pos[1] + offset[1] + radius < 0 ||
-    pos[1] + offset[1] - radius > Game.CANVAS_Y);
-  }
-
-  randomPos() {
-    return [
-      (Game.DIM_X - 50) * Math.random() + 25,
-      (Game.DIM_Y - 50) * Math.random() + 25
-    ];
-  }
-
-  removePlayer(player) {
-    if (player instanceof __WEBPACK_IMPORTED_MODULE_0__human_player__["a" /* default */]) {
-      this.humanPlayers.splice(this.humanPlayers.indexOf(player), 1);
-    } else if (player instanceof __WEBPACK_IMPORTED_MODULE_1__computer_player__["a" /* default */]) {
-      this.computerPlayers.splice(this.computerPlayers.indexOf(player), 1);
-    } else {
-      throw "unknown type of player :(";
-    }
-  }
 }
 
 Game.BG_COLOR = "#c8eafb";
@@ -450,7 +342,8 @@ class GameView {
   constructor(game, context) {
     this.context = context;
     this.game = game;
-
+    this.socket = io();
+    debugger
     this.addGameClickListeners();
   }
 
@@ -603,10 +496,7 @@ class ComputerPlayer extends __WEBPACK_IMPORTED_MODULE_1__player__["a" /* defaul
 
 
 class HumanPlayer extends __WEBPACK_IMPORTED_MODULE_1__player__["a" /* default */] {
-  power(impulse) {
-    this.velocity[0] += impulse[0];
-    this.velocity[1] += impulse[1];
-  }
+
 }
 
 /* harmony default export */ __webpack_exports__["a"] = HumanPlayer;
@@ -624,13 +514,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 document.addEventListener("DOMContentLoaded", () => {
-
-  // const socket = io.connect("http://localhost", { port: 3000 });
-  window.socket = io();
-  window.socket.on("test", data => {
-    debugger;
-  });
-  debugger
   const canvas = document.getElementById("game-canvas");
   canvas.width = __WEBPACK_IMPORTED_MODULE_0__game__["a" /* default */].CANVAS_X;
   canvas.height = __WEBPACK_IMPORTED_MODULE_0__game__["a" /* default */].CANVAS_Y;

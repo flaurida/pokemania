@@ -2,7 +2,8 @@ class GameView {
   constructor(game, context) {
     this.context = context;
     this.game = game;
-
+    this.socket = io();
+    debugger
     this.addGameClickListeners();
   }
 
