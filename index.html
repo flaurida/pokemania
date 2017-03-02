@@ -3,10 +3,25 @@
   <head>
     <meta charset="utf-8">
     <title>Pokemania!</title>
+
+    <link rel="stylesheet" href="assets/reset.css" />
+    <link rel="stylesheet" href="assets/pokemania.css" />
   </head>
   <body>
-    <h1>Pokemania!</h1>
     <canvas id="game-canvas" width="800" height="600"></canvas>
+
+    <div id="start-screen" class="hidden">
+      <h1>Welcome to Pokemania!</h1>
+
+      <form class="start-form">
+        <label for="name-input">Enter your name: </label>
+        <br />
+        <input type="text" id="name-input" />
+        <br />
+        <input type="submit" id="start-button" value="Start Training!" />
+      </form>
+    </div>
+
     <script src="./lib/bundle.js" charset="utf-8"></script>
   </body>
 </html>
