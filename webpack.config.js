@@ -1,7 +1,7 @@
 module.exports = {
-  entry: "./lib/pokemania.js",
+  entry: "./client/pokemania.js",
   output: {
-  	filename: "./lib/bundle.js"
+  	filename: "./client/bundle.js"
   },
   devtool: 'source-map'
 };

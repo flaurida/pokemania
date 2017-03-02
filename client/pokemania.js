@@ -4,7 +4,10 @@ import GameView from './game_view';
 document.addEventListener("DOMContentLoaded", () => {
 
   // const socket = io.connect("http://localhost", { port: 3000 });
-  const socket = io();
+  window.socket = io();
+  window.socket.on("test", data => {
+    debugger;
+  });
   debugger
   const canvas = document.getElementById("game-canvas");
   canvas.width = Game.CANVAS_X;

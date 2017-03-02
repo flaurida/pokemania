@@ -626,7 +626,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 document.addEventListener("DOMContentLoaded", () => {
 
   // const socket = io.connect("http://localhost", { port: 3000 });
-  const socket = io();
+  window.socket = io();
+  window.socket.on("test", data => {
+    debugger;
+  });
   debugger
   const canvas = document.getElementById("game-canvas");
   canvas.width = __WEBPACK_IMPORTED_MODULE_0__game__["a" /* default */].CANVAS_X;

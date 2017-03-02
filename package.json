@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "socket.io": "^1.7.3",
     "webpack": "^2.2.1"
   }
 }
