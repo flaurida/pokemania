@@ -192,6 +192,7 @@ class GameView {
 
   setEventHandlers() {
     this.addStartClickListener();
+    this.addInstructionsClickListener();
     this.addRestartClickListener();
 
     this.socket.on("draw game", this.drawGame.bind(this));
@@ -238,20 +239,53 @@ class GameView {
     const canvas = document.getElementById("game-canvas");
     const startScreen = document.getElementById("start-screen");
     const restartScreen = document.getElementById("restart-screen");
+    const instructions = document.getElementById("instructions");
 
     canvas.className = "";
     startScreen.className = "hidden";
     restartScreen.className = "hidden";
+    instructions.className= "hidden";
   }
 
   setGameRestartScreen() {
     const canvas = document.getElementById("game-canvas");
     const startScreen = document.getElementById("start-screen");
     const restartScreen = document.getElementById("restart-screen");
+    const instructions = document.getElementById("instructions");
 
     canvas.className = "hidden";
     startScreen.className = "hidden";
     restartScreen.className = "";
+    instructions.className= "hidden";
+  }
+
+  setInstructionsScreen() {
+    const canvas = document.getElementById("game-canvas");
+    const startScreen = document.getElementById("start-screen");
+    const restartScreen = document.getElementById("restart-screen");
+    const instructions = document.getElementById("instructions");
+
+    canvas.className = "hidden";
+    startScreen.className = "";
+    restartScreen.className = "hidden";
+    instructions.classList.toggle("hidden");
+  }
+
+  addInstructionsClickListener() {
+    const instructionsButton = document.getElementById("instructions-button");
+    instructionsButton.onclick = () => {
+      this.setInstructionsScreen();
+    };
+
+    const instructions = document.getElementById("instructions");
+    instructions.onclick = () => {
+      this.setInstructionsScreen();
+    };
+
+    const instructionsBody = document.getElementById("instructions-body");
+    instructionsBody.onclick = e => {
+      e.stopPropagation();
+    };
   }
 
   bindKeyHandlers() {
