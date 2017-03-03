@@ -16,6 +16,7 @@ class Sockets {
     client.on("disconnect", this.onClientDisconnect.bind(this));
     client.on("new player", this.onNewPlayer.bind(this));
     client.on("move player", this.onMovePlayer.bind(this));
+    client.on("dire hit player", this.onDireHitPlayer.bind(this));
   }
 
   onClientDisconnect() {
@@ -64,6 +65,12 @@ class Sockets {
     if (!this.game) return;
     const player = this.game.findHumanPlayer(data.id);
     if (player) player.power(data.impulses);
+  }
+
+  onDireHitPlayer(data) {
+    if (!this.game) return;
+    const player = this.game.findHumanPlayer(data.id);
+    if (player) player.activateDireHit();
   }
 }
 

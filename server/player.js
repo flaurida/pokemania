@@ -12,6 +12,7 @@ class Player {
     this.img = "assets/img/egg.png";
     this.id = options.id || Util.randomId();
     this.direHit = false;
+    this.activatingDireHit = false;
   }
 
   direHitDelay() {
@@ -19,16 +20,19 @@ class Player {
   }
 
   activateDireHit() {
-    setTimeout(this.useDireHit, this.direHitDelay());
+    if (this.activatingDireHit) return;
+    setTimeout(this.useDireHit.bind(this), this.direHitDelay());
+    this.activatingDireHit = true;
   }
 
   useDireHit() {
     this.direHit = true;
-    setTimeout(this.direHitWearsOff, DIRE_HIT_DURATION);
+    setTimeout(this.direHitWearsOff.bind(this), DIRE_HIT_DURATION);
   }
 
   direHitWearsOff() {
     this.direHit = false;
+    this.activatingDireHit = false;
   }
 
   evolve() {
@@ -96,13 +100,22 @@ class Player {
   }
 
   handleCollision(otherPlayer) {
-    console.log(this.name + " X " + otherPlayer.name);
     if (this.radius > otherPlayer.radius) {
-      this.radius += otherPlayer.radius / 2;
-      otherPlayer.remove();
+      if (!this.direHit && otherPlayer.direHit) {
+        otherPlayer.radius += this.radius / 2;
+        this.remove();
+      } else {
+        this.radius += otherPlayer.radius / 2;
+        otherPlayer.remove();
+      }
     } else {
-      otherPlayer.radius += this.radius / 2;
-      this.remove();
+      if (this.direHit && !otherPlayer.direHit) {
+        this.radius += otherPlayer.radius / 2;
+        otherPlayer.remove();
+      } else {
+        otherPlayer.radius += this.radius / 2;
+        this.remove();
+      }
     }
   }
 

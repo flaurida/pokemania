@@ -37,9 +37,9 @@ const drawPlayerOutline = (context, offset, data) => {
     0,
     2 * Math.PI
   );
-  
+
   context.lineWidth = data.direHit ? DIRE_HIT_OUTLINE_WIDTH : NORMAL_OUTLINE_WIDTH;
-  context.strokeStyle = data.direHIT ? DIRE_HIT_COLOR : PLAYER_INFO_COLOR;
+  context.strokeStyle = data.direHit ? DIRE_HIT_COLOR : PLAYER_INFO_COLOR;
   context.stroke();
 };
 

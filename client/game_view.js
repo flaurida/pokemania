@@ -34,7 +34,6 @@ class GameView {
     if (this.playStatus === "restartScreen") return;
 
     if (this.playStatus === "playing") {
-      console.log("draw while playing...");
       if (this.resetIfLost(data)) return;
       this.powerCurrentPlayer();
 
@@ -55,7 +54,6 @@ class GameView {
 
   resetIfLost(data) {
     if (!data[this.currentPlayerId] && this.initialData) {
-      console.log("reset if lost");
       this.currentPlayerId = null;
       this.setGameRestartScreen();
       this.playStatus = "restartScreen";
@@ -149,6 +147,12 @@ class GameView {
         }
       }, false);
     });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === " ") {
+        this.activateDireHit();
+      }
+    });
   }
 
   getCurrentPlayerOffset(data) {
@@ -168,6 +172,11 @@ class GameView {
     if (GameView.KEYS.right) allImpulses.push([impulse, 0]);
 
     this.socket.emit("move player", { id: this.currentPlayerId, impulses: allImpulses });
+  }
+
+  activateDireHit() {
+    debugger
+    this.socket.emit("dire hit player", { id: this.currentPlayerId });
   }
 }
 
