@@ -119,8 +119,11 @@ class Game {
         const player1 = allPlayers[i];
         const player2 = allPlayers[j];
 
-        if (player1.isCollidedWith(player2)) {
+        const proximity = player1.proximityTo(player2);
+        if (proximity === "collision") {
           player1.handleCollision(player2);
+        } else if (proximity === "danger") {
+          player1.handleDanger(player2);
         }
       }
     }

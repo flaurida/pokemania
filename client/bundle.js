@@ -305,6 +305,7 @@ class GameView {
     const startButton = document.getElementById("start-button");
     startButton.onclick = () => {
       this.name = document.getElementById("name-input").value;
+      if (this.name.length > 25) this.name = "";
       this.start(this.name);
     };
   }

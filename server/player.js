@@ -89,14 +89,21 @@ class Player {
     }
   }
 
-  isCollidedWith(otherPlayer) {
-    const centerDist = Util.dist(this.pos, otherPlayer.pos);
-    return centerDist < (this.radius + otherPlayer.radius);
-  }
-
   isOverlappingWith(pos) {
     const centerDist = Util.dist(this.pos, pos);
     return centerDist < (this.radius + 50);
+  }
+
+  proximityTo(otherPlayer) {
+    const dist = Util.dist(this.pos, otherPlayer.pos);
+
+    if (dist < (this.radius + otherPlayer.radius)) {
+      return "collision";
+    } else if (dist < (this.radius + otherPlayer.radius + NEARNESS_THRESHOLD)) {
+      return "danger";
+    } else {
+      return null;
+    }
   }
 
   handleCollision(otherPlayer) {
@@ -127,5 +134,6 @@ class Player {
 const NORMAL_FRAME_TIME_DELTA = 1000 / 60;
 const DIRE_HIT_DURATION = 500;
 const DIRE_HIT_DELAY = 500;
+const NEARNESS_THRESHOLD = 50;
 
 module.exports = Player;
