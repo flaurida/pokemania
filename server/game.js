@@ -88,11 +88,15 @@ class Game {
     const data = {};
 
     this.allPlayers().forEach(player => {
+      const direHitDelay = player.direHit ? player.direHitDelay() : null;
+
       data[player.id] = {
         pos: player.pos,
         radius: player.radius,
         name: player.name,
-        img: player.img
+        img: player.img,
+        direHit: player.direHit,
+        direHitDelay: direHitDelay
       };
     });
 

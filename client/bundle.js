@@ -73,6 +73,8 @@
 
 "use strict";
 const drawPlayer = (context, offset, data) => {
+  drawPlayerOutline(context, offset, data);
+
   const img = new Image();
   img.onload = () => {
     drawPlayerImage(context, offset, data, img);
@@ -81,11 +83,11 @@ const drawPlayer = (context, offset, data) => {
 
   drawPlayerImage(context, offset, data, img);
 
-  context.fillStyle = PLAYER_NAME_COLOR;
+  context.fillStyle = PLAYER_INFO_COLOR;
   context.font = "bold 14px Arial";
   context.fillText(
     data.name,
-    data.pos[0] + offset[0] + data.radius,
+    data.pos[0] + offset[0] + data.radius + 3,
     data.pos[1] + offset[1]
   );
 };
@@ -102,8 +104,26 @@ const drawPlayerImage = (context, offset, data, img) => {
   );
 };
 
+const drawPlayerOutline = (context, offset, data) => {
+  context.beginPath();
+  context.arc(
+    data.pos[0] + offset[0],
+    data.pos[1] + offset[1],
+    data.radius,
+    0,
+    2 * Math.PI
+  );
+  
+  context.lineWidth = data.direHit ? DIRE_HIT_OUTLINE_WIDTH : NORMAL_OUTLINE_WIDTH;
+  context.strokeStyle = data.direHIT ? DIRE_HIT_COLOR : PLAYER_INFO_COLOR;
+  context.stroke();
+};
+
 const NORMAL_FRAME_TIME_DELTA = 1000 / 60;
-const PLAYER_NAME_COLOR = "#000";
+const PLAYER_INFO_COLOR = "#000";
+const DIRE_HIT_COLOR = "#ff3d00";
+const NORMAL_OUTLINE_WIDTH = 5;
+const DIRE_HIT_OUTLINE_WIDTH = 10;
 
 
 /***/ }),
@@ -154,7 +174,7 @@ const outOfCanvasBounds = (player, offset) => {
 };
 
 const BG_COLOR = "#8bf1ff";
-const BORDER_WIDTH = 10;
+const BORDER_WIDTH = 15;
 const BORDER_COLOR = "#001f95";
 const GRADIENT_COLOR_ONE = "#11e80d";
 const GRADIENT_COLOR_TWO = "#0468ff";
@@ -195,6 +215,7 @@ class GameView {
     this.lastTime = 0;
     this.currentPlayerId = __WEBPACK_IMPORTED_MODULE_0__server_util___default.a.randomId();
     this.playStatus = "playing";
+    this.initialData = false;
 
     this.socket.emit("new player", { name: this.name, id: this.currentPlayerId });
   }
@@ -211,15 +232,28 @@ class GameView {
     if (this.playStatus === "restartScreen") return;
 
     if (this.playStatus === "playing") {
+      console.log("draw while playing...");
       if (this.resetIfLost(data)) return;
       this.powerCurrentPlayer();
-      const offset = this.getCurrentPlayerOffset(data);
-      __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__game__["c" /* drawGame */])(this.context, offset, data);
+
+      if (this.initialData) {
+        const offset = this.getCurrentPlayerOffset(data);
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__game__["c" /* drawGame */])(this.context, offset, data);
+      } else {
+        this.checkInitialData(data);
+      }
+    }
+  }
+
+  checkInitialData(data) {
+    if (data[this.currentPlayerId]) {
+      this.initialData = true;
     }
   }
 
   resetIfLost(data) {
-    if (!data[this.currentPlayerId]) {
+    if (!data[this.currentPlayerId] && this.initialData) {
+      console.log("reset if lost");
       this.currentPlayerId = null;
       this.setGameRestartScreen();
       this.playStatus = "restartScreen";

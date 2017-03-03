@@ -38,7 +38,7 @@ const outOfCanvasBounds = (player, offset) => {
 };
 
 const BG_COLOR = "#8bf1ff";
-const BORDER_WIDTH = 10;
+const BORDER_WIDTH = 15;
 const BORDER_COLOR = "#001f95";
 const GRADIENT_COLOR_ONE = "#11e80d";
 const GRADIENT_COLOR_TWO = "#0468ff";

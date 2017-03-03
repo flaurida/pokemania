@@ -17,6 +17,7 @@ class GameView {
     this.lastTime = 0;
     this.currentPlayerId = Util.randomId();
     this.playStatus = "playing";
+    this.initialData = false;
 
     this.socket.emit("new player", { name: this.name, id: this.currentPlayerId });
   }
@@ -33,15 +34,28 @@ class GameView {
     if (this.playStatus === "restartScreen") return;
 
     if (this.playStatus === "playing") {
+      console.log("draw while playing...");
       if (this.resetIfLost(data)) return;
       this.powerCurrentPlayer();
-      const offset = this.getCurrentPlayerOffset(data);
-      drawGame(this.context, offset, data);
+
+      if (this.initialData) {
+        const offset = this.getCurrentPlayerOffset(data);
+        drawGame(this.context, offset, data);
+      } else {
+        this.checkInitialData(data);
+      }
+    }
+  }
+
+  checkInitialData(data) {
+    if (data[this.currentPlayerId]) {
+      this.initialData = true;
     }
   }
 
   resetIfLost(data) {
-    if (!data[this.currentPlayerId]) {
+    if (!data[this.currentPlayerId] && this.initialData) {
+      console.log("reset if lost");
       this.currentPlayerId = null;
       this.setGameRestartScreen();
       this.playStatus = "restartScreen";

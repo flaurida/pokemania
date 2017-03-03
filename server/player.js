@@ -11,6 +11,24 @@ class Player {
     this.evolution = 0;
     this.img = "assets/img/egg.png";
     this.id = options.id || Util.randomId();
+    this.direHit = false;
+  }
+
+  direHitDelay() {
+    return this.radius / 15 * DIRE_HIT_DELAY;
+  }
+
+  activateDireHit() {
+    setTimeout(this.useDireHit, this.direHitDelay());
+  }
+
+  useDireHit() {
+    this.direHit = true;
+    setTimeout(this.direHitWearsOff, DIRE_HIT_DURATION);
+  }
+
+  direHitWearsOff() {
+    this.direHit = false;
   }
 
   evolve() {
@@ -94,5 +112,7 @@ class Player {
 }
 
 const NORMAL_FRAME_TIME_DELTA = 1000 / 60;
+const DIRE_HIT_DURATION = 500;
+const DIRE_HIT_DELAY = 500;
 
 module.exports = Player;

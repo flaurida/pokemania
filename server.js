@@ -33,6 +33,3 @@ const io = require("socket.io")(app);
 app.listen(3000);
 
 new Sockets(io, app);
-// io.on("connection", socket => {
-//   new Sockets(socket);
-// });
