@@ -5,20 +5,26 @@ export const drawGame = (context, offset, players) => {
   context.fillStyle = BG_COLOR;
   context.fillRect(0, 0, CANVAS_X, CANVAS_Y);
 
+  drawBorder(context, offset);
+
   Object.values(players).forEach(player => {
     if (!outOfCanvasBounds(player, offset)) {
       drawPlayer(context, offset, player);
     }
   });
-
-  drawBorder(context, offset);
 };
 
 const drawBorder = (context, offset) => {
-  context.strokeStyle = "#000";
+  context.strokeStyle = BORDER_COLOR;
   context.lineWidth = BORDER_WIDTH;
   context.strokeRect(offset[0], offset[1], DIM_X, DIM_Y);
   context.stroke();
+
+  const gradient = context.createLinearGradient(offset[0], offset[1], DIM_X / 2, DIM_Y / 2);
+  gradient.addColorStop(0, GRADIENT_COLOR_ONE);
+  gradient.addColorStop(1, GRADIENT_COLOR_TWO);
+  context.fillStyle = gradient;
+  context.fillRect(offset[0], offset[1], DIM_X, DIM_Y);
 };
 
 const outOfCanvasBounds = (player, offset) => {
@@ -31,9 +37,12 @@ const outOfCanvasBounds = (player, offset) => {
   pos[1] + offset[1] - radius > CANVAS_Y);
 };
 
-const BG_COLOR = "#c8eafb";
-const BORDER_WIDTH = 7;
+const BG_COLOR = "#8bf1ff";
+const BORDER_WIDTH = 10;
+const BORDER_COLOR = "#001f95";
+const GRADIENT_COLOR_ONE = "#11e80d";
+const GRADIENT_COLOR_TWO = "#0468ff";
 const DIM_X = 2000;
 const DIM_Y = 2000;
-export const CANVAS_X = 700;
-export const CANVAS_Y = 450;
+export const CANVAS_X = 800;
+export const CANVAS_Y = 550;

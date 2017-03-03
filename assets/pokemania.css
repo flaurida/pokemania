@@ -6,9 +6,16 @@ body {
   display: none;
 }
 
+canvas {
+  margin: 20px 0;
+  margin-left: calc(50% - 405px);
+  border: 5px solid black;
+  border-radius: 10px;
+}
+
 #start-screen, .links-container {
   margin: 20px auto;
-  background: #2ff9ed;
+  background: #8bf1ff;
   width: 80%;
   max-width: 600px;
   border: 5px solid black;
