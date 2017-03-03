@@ -1,49 +1,39 @@
-import HumanPlayer from './human_player';
-import ComputerPlayer from './computer_player';
-import Util from './util';
+import { drawPlayer } from './player';
 
-class Game {
-  constructor() {
-    this.players = [];
-  }
+export const drawGame = (context, offset, players) => {
+  context.clearRect(0, 0, CANVAS_X, CANVAS_Y);
+  context.fillStyle = BG_COLOR;
+  context.fillRect(0, 0, CANVAS_X, CANVAS_Y);
 
-  addPlayer(player) {
-    if (player instanceof HumanPlayer) {
-      this.humanPlayers.push(player);
-    } else if (player instanceof ComputerPlayer) {
-      this.computerPlayers.push(player);
-    } else {
-      throw "unknown type of player :(";
+  Object.values(players).forEach(player => {
+    if (!outOfCanvasBounds(player, offset)) {
+      drawPlayer(context, offset, player);
     }
-  }
+  });
 
-  draw(context, offset) {
-    context.clearRect(0, 0, Game.CANVAS_X, Game.CANVAS_Y);
-    context.fillStyle = Game.BG_COLOR;
-    context.fillRect(0, 0, Game.CANVAS_X, Game.CANVAS_Y);
+  drawBorder(context, offset);
+};
 
-    this.allPlayers().forEach(player => {
-      if (!this.outOfCanvasBounds(player, offset)) {
-        player.draw(context, offset);
-      }
-    });
+const drawBorder = (context, offset) => {
+  context.strokeStyle = "#000";
+  context.lineWidth = BORDER_WIDTH;
+  context.strokeRect(offset[0], offset[1], DIM_X, DIM_Y);
+  context.stroke();
+};
 
-    this.drawBorder(context, offset);
-  }
+const outOfCanvasBounds = (player, offset) => {
+  const pos = player.pos,
+    radius = player.radius;
 
-  drawBorder(context, offset) {
-    context.strokeStyle = "#000";
-    context.lineWidth = Game.BORDER_WIDTH;
-    context.strokeRect(offset[0], offset[1], Game.DIM_X, Game.DIM_Y);
-    context.stroke();
-  }
-}
+  return (pos[0] + offset[0] + radius < 0 ||
+  pos[0] + offset[0] - radius > CANVAS_X ||
+  pos[1] + offset[1] + radius < 0 ||
+  pos[1] + offset[1] - radius > CANVAS_Y);
+};
 
-Game.BG_COLOR = "#c8eafb";
-Game.BORDER_WIDTH = 7;
-Game.DIM_X = 2000;
-Game.DIM_Y = 2000;
-Game.CANVAS_X = 700;
-Game.CANVAS_Y = 450;
-
-export default Game;
+const BG_COLOR = "#c8eafb";
+const BORDER_WIDTH = 7;
+const DIM_X = 2000;
+const DIM_Y = 2000;
+export const CANVAS_X = 700;
+export const CANVAS_Y = 450;

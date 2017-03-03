@@ -10,6 +10,20 @@ class Game {
     this.addComputerPlayers(40);
   }
 
+  findHumanPlayer(id) {
+    for (let i = 0; i < this.humanPlayers.length; i++) {
+      if (this.humanPlayers[i].id === id) {
+        return this.humanPlayers[i];
+      }
+    }
+
+    return false;
+  }
+
+  isEmpty() {
+    return this.humanPlayers.length <= 0;
+  }
+
   addPlayer(player) {
     if (player instanceof HumanPlayer) {
       this.humanPlayers.push(player);
@@ -20,12 +34,13 @@ class Game {
     }
   }
 
-  addNewHumanPlayer(name) {
+  addNewHumanPlayer(name, id) {
     const humanPlayer = new HumanPlayer({
       pos: this.randomPos(),
       game: this,
       name: name,
-      pokemonId: Util.randomPokemonId()
+      id: id,
+      radius: Util.DEFAULT_RADIUS,
     });
 
     this.addPlayer(humanPlayer);
@@ -35,11 +50,7 @@ class Game {
   addNewComputerPlayer() {
     const computerPlayer = new ComputerPlayer({
       pos: this.randomPos(),
-      game: this,
-      velocity: Util.randomVelocity(),
-      radius: Util.randomRadius(),
-      name: Util.randomPlayerName(),
-      pokemonId: Util.randomPokemonId()
+      game: this
     });
 
     this.addPlayer(computerPlayer);
@@ -63,6 +74,22 @@ class Game {
   step(timeDelta) {
     this.moveObjects(timeDelta);
     this.checkCollisions();
+    return this.parsePlayerData();
+  }
+
+  parsePlayerData() {
+    const data = {};
+
+    this.allPlayers().forEach(player => {
+      data[player.id] = {
+        pos: player.pos,
+        radius: player.radius,
+        name: player.name,
+        img: player.img
+      };
+    });
+
+    return data;
   }
 
   moveObjects(timeDelta) {
@@ -97,16 +124,6 @@ class Game {
 
     return (pos[0] - radius < 0) || (pos[1] - radius < 0) ||
       (pos[0] > Game.DIM_X - radius) || (pos[1] > Game.DIM_Y - radius);
-  }
-
-  outOfCanvasBounds(player, offset) {
-    const pos = player.pos,
-      radius = player.radius;
-
-    return (pos[0] + offset[0] + radius < 0 ||
-    pos[0] + offset[0] - radius > Game.CANVAS_X ||
-    pos[1] + offset[1] + radius < 0 ||
-    pos[1] + offset[1] - radius > Game.CANVAS_Y);
   }
 
   randomPos() {

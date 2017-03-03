@@ -67,211 +67,43 @@
 /******/ })
 /************************************************************************/
 /******/ ([
-/* 0 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-const Util = {
-  dist(pos1, pos2) {
-    return Math.sqrt(
-      Math.pow(pos1[0] - pos2[0], 2) + Math.pow(pos1[1] - pos2[1], 2)
-    );
-  },
-
-  randomRadius() {
-    return Math.floor(Math.random() * (20 - 5)) + 5;
-  },
-
-  randomVelocity() {
-    return [
-      this.randomVelocityPiece(),
-      this.randomVelocityPiece()
-    ];
-  },
-
-  randomVelocityPiece() {
-    return Math.floor(Math.random() * (1.2 + 1.2)) - 1.2;
-  },
-
-  randomPokemonId() {
-    return POKEMON_IDS[Math.floor(Math.random() * POKEMON_IDS.length)];
-  },
-
-  randomPlayerName() {
-    return POKEMON_CHARACTER_NAMES[Math.floor(Math.random() * POKEMON_CHARACTER_NAMES.length)];
-  }
-};
-
-const POKEMON_IDS = [
-  1, 4, 7, 24, 29, 34, 147, 155, 220, 304
-];
-
-const POKEMON_CHARACTER_NAMES = [
-  "Misty",
-  "Lass",
-  "Serena",
-  "Bonnie",
-  "Iris",
-  "Jessie",
-  "Lillie",
-  "May",
-  "Dawn",
-  "Moon",
-  "Mallow",
-  "Sakura",
-  "Shauna",
-  "Candela",
-  "Officer Jenny",
-  "Aria",
-  "Olivia",
-  "Lusamine",
-  "Lana",
-  "Professor Ivy",
-  "Mom",
-  "Sabrina",
-  "Viola",
-  "Daisy",
-  "Bianca",
-  "Sumomo",
-  "Blanche",
-  "Agatha",
-  "Georgia",
-  "Grace",
-  "Malva",
-  "Karen"
-];
-
-/* harmony default export */ __webpack_exports__["a"] = Util;
-
-
-/***/ }),
+/* 0 */,
 /* 1 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(0);
+const drawPlayer = (context, offset, data) => {
+  const img = new Image();
+  img.onload = () => {
+    drawPlayerImage(context, offset, data, img);
+  };
+  img.src = data.img;
+
+  drawPlayerImage(context, offset, data, img);
+
+  context.fillStyle = PLAYER_NAME_COLOR;
+  context.font = "bold 14px Arial";
+  context.fillText(
+    data.name,
+    data.pos[0] + offset[0] + data.radius,
+    data.pos[1] + offset[1]
+  );
+};
+/* harmony export (immutable) */ __webpack_exports__["a"] = drawPlayer;
 
 
-class Player {
-  constructor(options) {
-    this.pos = options.pos;
-    this.velocity = options.velocity || [0, 0];
-    this.radius = options.radius || DEFAULT_RADIUS;
-    this.name = options.name || "Misty";
-    this.color = options.color || "#ff00fc";
-    this.pokemonId = __WEBPACK_IMPORTED_MODULE_0__util__["a" /* default */].randomPokemonId() || 7;
-    this.game = options.game;
-    this.evolution = 0;
-  }
-
-  draw(context, offset) {
-    if (!this.img) {
-      this.img = new Image();
-      this.img.onload = () => {
-        this.drawPlayerImage(context, offset);
-      };
-      this.img.src = "assets/img/egg.png";
-    }
-
-    this.evolve();
-    this.drawPlayerImage(context, offset);
-
-    context.fillStyle = PLAYER_NAME_COLOR;
-    context.font = "bold 14px Arial";
-    context.fillText(
-      this.name,
-      this.pos[0] + offset[0] + this.radius,
-      this.pos[1] + offset[1]
-    );
-  }
-
-  evolve() {
-    if (this.radius < 30 || this.evolution >= 3) {
-      return;
-    } else if (this.radius > 30 && this.evolution <= 0) {
-      this.evolution++;
-      this.img.src = `assets/img/pokemon-${this.pokemonId}.png`;
-    } else if (this.radius > 60 && this.evolution <= 1) {
-      this.pokemonId++;
-      this.evolution++;
-      this.img.src = `assets/img/pokemon-${this.pokemonId}.png`;
-    } else if (this.radius > 90 && this.evolution <= 2) {
-      this.pokemonId++;
-      this.evolution++;
-      this.img.src = `assets/img/pokemon-${this.pokemonId}.png`;
-    }
-  }
-
-  drawPlayerImage(context, offset) {
-    context.drawImage(
-      this.img,
-      this.pos[0] + offset[0] - this.radius,
-      this.pos[1] + offset[1] - this.radius,
-      this.radius * 2,
-      this.radius * 2
-    );
-  }
-
-  move(timeDelta) {
-    const velocityScale = timeDelta / NORMAL_FRAME_TIME_DELTA,
-      sizeScale = (DEFAULT_RADIUS / this.radius - 1) / 4,
-      deltaX = this.velocity[0] * velocityScale * (1 + sizeScale),
-      deltaY = this.velocity[1] * velocityScale * (1 + sizeScale),
-      oldPos = this.pos;
-
-    this.pos = [this.pos[0] + deltaX, this.pos[1] + deltaY];
-    if (this.game.outOfBounds(this)) {
-      this.adjustOutOfBounds();
-    }
-  }
-
-  adjustOutOfBounds() {
-    if (this.pos[0] > this.game.constructor.DIM_X - this.radius || this.pos[0] < this.radius) {
-      this.velocity[0] = -this.velocity[0];
-
-      if (this.pos[0] < this.radius) {
-        this.pos[0] = this.radius;
-      } else {
-        this.pos[0] = this.game.constructor.DIM_X - this.radius;
-      }
-    }
-
-    if (this.pos[1] > this.game.constructor.DIM_Y - this.radius || this.pos[1] < this.radius) {
-      this.velocity[1] = -this.velocity[1];
-
-      if (this.pos[1] < this.radius) {
-        this.pos[1] = this.radius;
-      } else {
-        this.pos[1] = this.game.constructor.DIM_Y - this.radius;
-      }
-    }
-  }
-
-  isCollidedWith(otherPlayer) {
-    const centerDist = __WEBPACK_IMPORTED_MODULE_0__util__["a" /* default */].dist(this.pos, otherPlayer.pos);
-    return centerDist < (this.radius + otherPlayer.radius);
-  }
-
-  handleCollision(otherPlayer) {
-    if (this.radius > otherPlayer.radius) {
-      this.radius += otherPlayer.radius / 2;
-      otherPlayer.remove();
-    } else {
-      otherPlayer.radius += this.radius / 2;
-      this.remove();
-    }
-  }
-
-  remove() {
-    this.game.removePlayer(this);
-  }
-}
+const drawPlayerImage = (context, offset, data, img) => {
+  context.drawImage(
+    img,
+    data.pos[0] + offset[0] - data.radius,
+    data.pos[1] + offset[1] - data.radius,
+    data.radius * 2,
+    data.radius * 2
+  );
+};
 
 const NORMAL_FRAME_TIME_DELTA = 1000 / 60;
 const PLAYER_NAME_COLOR = "#000";
-const DEFAULT_RADIUS = 15;
-
-/* harmony default export */ __webpack_exports__["a"] = Player;
 
 
 /***/ }),
@@ -279,58 +111,52 @@ const DEFAULT_RADIUS = 15;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__human_player__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__computer_player__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__player__ = __webpack_require__(1);
 
 
+const drawGame = (context, offset, players) => {
+  context.clearRect(0, 0, CANVAS_X, CANVAS_Y);
+  context.fillStyle = BG_COLOR;
+  context.fillRect(0, 0, CANVAS_X, CANVAS_Y);
 
-
-class Game {
-  constructor() {
-    this.players = [];
-  }
-
-  addPlayer(player) {
-    if (player instanceof __WEBPACK_IMPORTED_MODULE_0__human_player__["a" /* default */]) {
-      this.humanPlayers.push(player);
-    } else if (player instanceof __WEBPACK_IMPORTED_MODULE_1__computer_player__["a" /* default */]) {
-      this.computerPlayers.push(player);
-    } else {
-      throw "unknown type of player :(";
+  Object.values(players).forEach(player => {
+    if (!outOfCanvasBounds(player, offset)) {
+      __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__player__["a" /* drawPlayer */])(context, offset, player);
     }
-  }
+  });
 
-  draw(context, offset) {
-    context.clearRect(0, 0, Game.CANVAS_X, Game.CANVAS_Y);
-    context.fillStyle = Game.BG_COLOR;
-    context.fillRect(0, 0, Game.CANVAS_X, Game.CANVAS_Y);
+  drawBorder(context, offset);
+};
+/* harmony export (immutable) */ __webpack_exports__["c"] = drawGame;
 
-    this.allPlayers().forEach(player => {
-      if (!this.outOfCanvasBounds(player, offset)) {
-        player.draw(context, offset);
-      }
-    });
 
-    this.drawBorder(context, offset);
-  }
+const drawBorder = (context, offset) => {
+  context.strokeStyle = "#000";
+  context.lineWidth = BORDER_WIDTH;
+  context.strokeRect(offset[0], offset[1], DIM_X, DIM_Y);
+  context.stroke();
+};
 
-  drawBorder(context, offset) {
-    context.strokeStyle = "#000";
-    context.lineWidth = Game.BORDER_WIDTH;
-    context.strokeRect(offset[0], offset[1], Game.DIM_X, Game.DIM_Y);
-    context.stroke();
-  }
-}
+const outOfCanvasBounds = (player, offset) => {
+  const pos = player.pos,
+    radius = player.radius;
 
-Game.BG_COLOR = "#c8eafb";
-Game.BORDER_WIDTH = 7;
-Game.DIM_X = 2000;
-Game.DIM_Y = 2000;
-Game.CANVAS_X = 700;
-Game.CANVAS_Y = 450;
+  return (pos[0] + offset[0] + radius < 0 ||
+  pos[0] + offset[0] - radius > CANVAS_X ||
+  pos[1] + offset[1] + radius < 0 ||
+  pos[1] + offset[1] - radius > CANVAS_Y);
+};
 
-/* harmony default export */ __webpack_exports__["a"] = Game;
+const BG_COLOR = "#c8eafb";
+const BORDER_WIDTH = 7;
+const DIM_X = 2000;
+const DIM_Y = 2000;
+const CANVAS_X = 700;
+/* harmony export (immutable) */ __webpack_exports__["a"] = CANVAS_X;
+
+const CANVAS_Y = 450;
+/* harmony export (immutable) */ __webpack_exports__["b"] = CANVAS_Y;
+
 
 
 /***/ }),
@@ -338,27 +164,56 @@ Game.CANVAS_Y = 450;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__server_util__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__server_util___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__server_util__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game__ = __webpack_require__(2);
+
+
+
 class GameView {
-  constructor(game, context) {
+  constructor(context, socket) {
     this.context = context;
-    this.game = game;
-    this.socket = io();
-    debugger
-    this.addGameClickListeners();
+    this.socket = socket;
+    this.currentPlayerId = null;
+    this.playStatus = "startScreen";
+
+    this.setEventHandlers();
   }
 
   start(name) {
     this.bindKeyHandlers();
-    this.currentPlayer = this.game.addNewHumanPlayer(name);
     this.setGameStartScreen(name);
     this.lastTime = 0;
+    this.currentPlayerId = __WEBPACK_IMPORTED_MODULE_0__server_util___default.a.randomId();
+    this.playStatus = "playing";
 
-    requestAnimationFrame(this.animate.bind(this));
+    this.socket.emit("new player", { name: this.name, id: this.currentPlayerId });
   }
 
-  addGameClickListeners() {
+  setEventHandlers() {
     this.addStartClickListener();
     this.addRestartClickListener();
+
+    this.socket.on("draw game", this.drawGame.bind(this));
+  }
+
+  drawGame(data) {
+    this.resetIfLost(data);
+
+    if (this.playStatus === "playing") {
+      this.powerCurrentPlayer();
+      const offset = this.getCurrentPlayerOffset(data);
+      __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__game__["c" /* drawGame */])(this.context, offset, data);
+    } else if (this.playStatus === "restartScreen") {
+      this.setGameRestartScreen();
+    }
+  }
+
+  resetIfLost(data) {
+    if (!data[this.currentPlayerId] && this.playStatus === "playing") {
+      this.currentPlayerId = null;
+      this.playStatus = "restartScreen";
+    }
   }
 
   addStartClickListener() {
@@ -374,10 +229,6 @@ class GameView {
     restartButton.onclick = () => {
       this.start(this.name);
     };
-  }
-
-  currentPlayerStillInGame() {
-    return this.game.humanPlayersInclude(this.currentPlayer);
   }
 
   setGameStartScreen() {
@@ -418,36 +269,23 @@ class GameView {
     });
   }
 
-  animate(time) {
-    const timeDelta = time - this.lastTime;
-    const offset = this.getCurrentPlayerOffset();
-
-    if (this.currentPlayerStillInGame()) {
-      this.powerCurrentPlayer();
-      this.game.step(timeDelta);
-      this.game.draw(this.context, offset);
-      this.lastTime = time;
-
-      requestAnimationFrame(this.animate.bind(this));
-    } else {
-      this.setGameRestartScreen();
-    }
-  }
-
-  getCurrentPlayerOffset() {
+  getCurrentPlayerOffset(data) {
     return [
-      this.game.constructor.CANVAS_X / 2 - this.currentPlayer.pos[0],
-      this.game.constructor.CANVAS_Y / 2 - this.currentPlayer.pos[1]
+      __WEBPACK_IMPORTED_MODULE_1__game__["a" /* CANVAS_X */] / 2 - data[this.currentPlayerId].pos[0],
+      __WEBPACK_IMPORTED_MODULE_1__game__["b" /* CANVAS_Y */] / 2 - data[this.currentPlayerId].pos[1]
     ];
   }
 
   powerCurrentPlayer() {
     const impulse = 0.5;
+    const allImpulses = [];
 
-    if (GameView.KEYS.up) this.currentPlayer.power([0, -impulse]);
-    if (GameView.KEYS.down) this.currentPlayer.power([0, impulse]);
-    if (GameView.KEYS.left) this.currentPlayer.power([-impulse, 0]);
-    if (GameView.KEYS.right) this.currentPlayer.power([impulse, 0]);
+    if (GameView.KEYS.up) allImpulses.push([0, -impulse]);
+    if (GameView.KEYS.down) allImpulses.push([0, impulse]);
+    if (GameView.KEYS.left) allImpulses.push([-impulse, 0]);
+    if (GameView.KEYS.right) allImpulses.push([impulse, 0]);
+
+    this.socket.emit("move player", { id: this.currentPlayerId, impulses: allImpulses });
   }
 }
 
@@ -469,40 +307,8 @@ GameView.KEYS = {
 
 
 /***/ }),
-/* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__player__ = __webpack_require__(1);
-
-
-
-class ComputerPlayer extends __WEBPACK_IMPORTED_MODULE_1__player__["a" /* default */] {
-
-}
-
-/* harmony default export */ __webpack_exports__["a"] = ComputerPlayer;
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__player__ = __webpack_require__(1);
-
-
-
-class HumanPlayer extends __WEBPACK_IMPORTED_MODULE_1__player__["a" /* default */] {
-
-}
-
-/* harmony default export */ __webpack_exports__["a"] = HumanPlayer;
-
-
-/***/ }),
+/* 4 */,
+/* 5 */,
 /* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -515,13 +321,104 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("game-canvas");
-  canvas.width = __WEBPACK_IMPORTED_MODULE_0__game__["a" /* default */].CANVAS_X;
-  canvas.height = __WEBPACK_IMPORTED_MODULE_0__game__["a" /* default */].CANVAS_Y;
+  canvas.width = __WEBPACK_IMPORTED_MODULE_0__game__["a" /* CANVAS_X */];
+  canvas.height = __WEBPACK_IMPORTED_MODULE_0__game__["b" /* CANVAS_Y */];
 
   const context = canvas.getContext("2d");
-  const game = new __WEBPACK_IMPORTED_MODULE_0__game__["a" /* default */]();
-  const gameView = new __WEBPACK_IMPORTED_MODULE_1__game_view__["a" /* default */](game, context);
+  const socket = io();
+
+  const gameView = new __WEBPACK_IMPORTED_MODULE_1__game_view__["a" /* default */](context, socket);
 });
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports) {
+
+const Util = {
+  dist(pos1, pos2) {
+    return Math.sqrt(
+      Math.pow(pos1[0] - pos2[0], 2) + Math.pow(pos1[1] - pos2[1], 2)
+    );
+  },
+
+  randomRadius() {
+    return Math.floor(Math.random() * (20 - 5)) + 5;
+  },
+
+  randomVelocity() {
+    return [
+      this.randomVelocityPiece(),
+      this.randomVelocityPiece()
+    ];
+  },
+
+  randomVelocityPiece() {
+    return Math.floor(Math.random() * (1.2 + 1.2)) - 1.2;
+  },
+
+  randomPokemonId() {
+    return POKEMON_IDS[Math.floor(Math.random() * POKEMON_IDS.length)];
+  },
+
+  randomPlayerName() {
+    return POKEMON_CHARACTER_NAMES[Math.floor(Math.random() * POKEMON_CHARACTER_NAMES.length)];
+  },
+
+  randomId() {
+    let text = "";
+    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for (let i = 0; i < 5; i++) {
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+
+    return text;
+  },
+
+  DEFAULT_RADIUS: 15
+};
+
+const POKEMON_IDS = [
+  1, 4, 7, 24, 29, 34, 112, 147, 152, 155, 158, 220, 304
+];
+
+const POKEMON_CHARACTER_NAMES = [
+  "Misty",
+  "Lass",
+  "Serena",
+  "Bonnie",
+  "Iris",
+  "Jessie",
+  "Lillie",
+  "May",
+  "Dawn",
+  "Moon",
+  "Mallow",
+  "Sakura",
+  "Shauna",
+  "Candela",
+  "Officer Jenny",
+  "Aria",
+  "Olivia",
+  "Lusamine",
+  "Lana",
+  "Professor Ivy",
+  "Mom",
+  "Sabrina",
+  "Viola",
+  "Daisy",
+  "Bianca",
+  "Sumomo",
+  "Blanche",
+  "Agatha",
+  "Georgia",
+  "Grace",
+  "Malva",
+  "Karen"
+];
+
+module.exports = Util;
 
 
 /***/ })

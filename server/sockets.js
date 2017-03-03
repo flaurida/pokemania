@@ -8,7 +8,7 @@ class Sockets {
   }
 
   setEventHandlers() {
-    this.socket.sockets.on("connection", this.onSocketConnection.bind(this));
+    this.socket.on("connection", this.onSocketConnection.bind(this));
   }
 
   onSocketConnection(client) {
@@ -23,33 +23,46 @@ class Sockets {
   }
 
   onNewPlayer(data) {
-    if (!this.game) this.game = new Game();
-    const newPlayer = this.game.addNewHumanPlayer(data.name);
-
-    this.socket.broadcast.emit("new player", {
-      pos: newPlayer.pos,
-      radius: newPlayer.radius,
-      name: newPlayer.name,
-      img: newPlayer.img.src
-    });
-
-    const existingPlayers = this.game.allPlayers();
-
-    for (let i = 0; i < this.existingPlayers.length; i++) {
-      let existingPlayer = this.existingPlayers[i];
-
-      this.socket.emit("new player", {
-        pos: existingPlayer.pos,
-        radius: existingPlayer.radius,
-        name: existingPlayer.name,
-        img: existingPlayer.img.src
-      });
+    if (!this.game) {
+      this.startNewGame();
     }
+
+    this.game.addNewHumanPlayer(data.name, data.id);
+  }
+
+  startNewGame() {
+    this.game = new Game();
+    this.lastTime = Date.now();
+    this.gameLoop = setInterval(this.stepCurrentGame.bind(this), 1000 / 60);
+  }
+
+  stepCurrentGame() {
+    if (this.closeGameIfNeeded()) return;
+    const nextTime = Date.now();
+    const timeDelta = nextTime - this.lastTime;
+    const data = this.game.step(timeDelta);
+    this.socket.emit("draw game", data);
+    this.lastTime = nextTime;
+  }
+
+  closeGameIfNeeded() {
+    if (this.game.isEmpty()) {
+      this.stopGame();
+      return true;
+    }
+
+    return false;
+  }
+
+  stopGame() {
+    clearInterval(this.gameLoop);
+    this.gameLoop = null;
+    this.game = null;
   }
 
   onMovePlayer(data) {
-    // this.socket.emit("test", { name: "Laura "});
-
+    const player = this.game.findHumanPlayer(data.id);
+    if (player) player.power(data.impulses);
   }
 }
 

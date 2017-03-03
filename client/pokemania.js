@@ -1,12 +1,13 @@
-import Game from './game';
+import { CANVAS_X, CANVAS_Y } from './game';
 import GameView from './game_view';
 
 document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("game-canvas");
-  canvas.width = Game.CANVAS_X;
-  canvas.height = Game.CANVAS_Y;
+  canvas.width = CANVAS_X;
+  canvas.height = CANVAS_Y;
 
   const context = canvas.getContext("2d");
-  const game = new Game();
-  const gameView = new GameView(game, context);
+  const socket = io();
+
+  const gameView = new GameView(context, socket);
 });

@@ -26,11 +26,24 @@ const Util = {
 
   randomPlayerName() {
     return POKEMON_CHARACTER_NAMES[Math.floor(Math.random() * POKEMON_CHARACTER_NAMES.length)];
-  }
+  },
+
+  randomId() {
+    let text = "";
+    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for (let i = 0; i < 5; i++) {
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+
+    return text;
+  },
+
+  DEFAULT_RADIUS: 15
 };
 
 const POKEMON_IDS = [
-  1, 4, 7, 24, 29, 34, 147, 155, 220, 304
+  1, 4, 7, 24, 29, 34, 112, 147, 152, 155, 158, 220, 304
 ];
 
 const POKEMON_CHARACTER_NAMES = [

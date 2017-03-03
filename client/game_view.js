@@ -1,24 +1,50 @@
+import Util from '../server/util';
+import { drawGame, CANVAS_X, CANVAS_Y } from './game';
+
 class GameView {
-  constructor(game, context) {
+  constructor(context, socket) {
     this.context = context;
-    this.game = game;
-    this.socket = io();
-    debugger
-    this.addGameClickListeners();
+    this.socket = socket;
+    this.currentPlayerId = null;
+    this.playStatus = "startScreen";
+
+    this.setEventHandlers();
   }
 
   start(name) {
     this.bindKeyHandlers();
-    this.currentPlayer = this.game.addNewHumanPlayer(name);
     this.setGameStartScreen(name);
     this.lastTime = 0;
+    this.currentPlayerId = Util.randomId();
+    this.playStatus = "playing";
 
-    requestAnimationFrame(this.animate.bind(this));
+    this.socket.emit("new player", { name: this.name, id: this.currentPlayerId });
   }
 
-  addGameClickListeners() {
+  setEventHandlers() {
     this.addStartClickListener();
     this.addRestartClickListener();
+
+    this.socket.on("draw game", this.drawGame.bind(this));
+  }
+
+  drawGame(data) {
+    this.resetIfLost(data);
+
+    if (this.playStatus === "playing") {
+      this.powerCurrentPlayer();
+      const offset = this.getCurrentPlayerOffset(data);
+      drawGame(this.context, offset, data);
+    } else if (this.playStatus === "restartScreen") {
+      this.setGameRestartScreen();
+    }
+  }
+
+  resetIfLost(data) {
+    if (!data[this.currentPlayerId] && this.playStatus === "playing") {
+      this.currentPlayerId = null;
+      this.playStatus = "restartScreen";
+    }
   }
 
   addStartClickListener() {
@@ -34,10 +60,6 @@ class GameView {
     restartButton.onclick = () => {
       this.start(this.name);
     };
-  }
-
-  currentPlayerStillInGame() {
-    return this.game.humanPlayersInclude(this.currentPlayer);
   }
 
   setGameStartScreen() {
@@ -78,36 +100,23 @@ class GameView {
     });
   }
 
-  animate(time) {
-    const timeDelta = time - this.lastTime;
-    const offset = this.getCurrentPlayerOffset();
-
-    if (this.currentPlayerStillInGame()) {
-      this.powerCurrentPlayer();
-      this.game.step(timeDelta);
-      this.game.draw(this.context, offset);
-      this.lastTime = time;
-
-      requestAnimationFrame(this.animate.bind(this));
-    } else {
-      this.setGameRestartScreen();
-    }
-  }
-
-  getCurrentPlayerOffset() {
+  getCurrentPlayerOffset(data) {
     return [
-      this.game.constructor.CANVAS_X / 2 - this.currentPlayer.pos[0],
-      this.game.constructor.CANVAS_Y / 2 - this.currentPlayer.pos[1]
+      CANVAS_X / 2 - data[this.currentPlayerId].pos[0],
+      CANVAS_Y / 2 - data[this.currentPlayerId].pos[1]
     ];
   }
 
   powerCurrentPlayer() {
     const impulse = 0.5;
+    const allImpulses = [];
 
-    if (GameView.KEYS.up) this.currentPlayer.power([0, -impulse]);
-    if (GameView.KEYS.down) this.currentPlayer.power([0, impulse]);
-    if (GameView.KEYS.left) this.currentPlayer.power([-impulse, 0]);
-    if (GameView.KEYS.right) this.currentPlayer.power([impulse, 0]);
+    if (GameView.KEYS.up) allImpulses.push([0, -impulse]);
+    if (GameView.KEYS.down) allImpulses.push([0, impulse]);
+    if (GameView.KEYS.left) allImpulses.push([-impulse, 0]);
+    if (GameView.KEYS.right) allImpulses.push([impulse, 0]);
+
+    this.socket.emit("move player", { id: this.currentPlayerId, impulses: allImpulses });
   }
 }
 
