@@ -37,8 +37,24 @@ const outOfCanvasBounds = (player, offset) => {
   pos[1] + offset[1] - radius > CANVAS_Y);
 };
 
+export const drawCountdown = (context, time) => {
+  context.beginPath();
+  context.rect(20, 20, 100, 40);
+  context.fillStyle = 'white';
+  context.fill();
+  context.lineWidth = COUNTDOWN_WIDTH;
+  context.strokeStyle = BORDER_COLOR;
+  // context.stroke();
+
+  context.fillStyle = BORDER_COLOR;
+  context.font = "bold 24px Arial";
+
+  context.fillText(Math.floor(time) / 1000, 25, 45);
+};
+
 const BG_COLOR = "#8bf1ff";
 const BORDER_WIDTH = 15;
+const COUNTDOWN_WIDTH = 5;
 const BORDER_COLOR = "#001f95";
 const GRADIENT_COLOR_ONE = "#11e80d";
 const GRADIENT_COLOR_TWO = "#0468ff";

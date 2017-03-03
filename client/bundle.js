@@ -74,6 +74,7 @@
 "use strict";
 const drawPlayer = (context, offset, data) => {
   drawPlayerOutline(context, offset, data);
+  drawPlayerName(context, offset, data);
 
   const img = new Image();
   img.onload = () => {
@@ -82,7 +83,11 @@ const drawPlayer = (context, offset, data) => {
   img.src = data.img;
 
   drawPlayerImage(context, offset, data, img);
+};
+/* harmony export (immutable) */ __webpack_exports__["a"] = drawPlayer;
 
+
+const drawPlayerName = (context, offset, data) => {
   context.fillStyle = PLAYER_INFO_COLOR;
   context.font = "bold 14px Arial";
   context.fillText(
@@ -91,8 +96,6 @@ const drawPlayer = (context, offset, data) => {
     data.pos[1] + offset[1]
   );
 };
-/* harmony export (immutable) */ __webpack_exports__["a"] = drawPlayer;
-
 
 const drawPlayerImage = (context, offset, data, img) => {
   context.drawImage(
@@ -119,7 +122,6 @@ const drawPlayerOutline = (context, offset, data) => {
   context.stroke();
 };
 
-const NORMAL_FRAME_TIME_DELTA = 1000 / 60;
 const PLAYER_INFO_COLOR = "#000";
 const DIRE_HIT_COLOR = "#ff3d00";
 const NORMAL_OUTLINE_WIDTH = 5;
@@ -173,8 +175,26 @@ const outOfCanvasBounds = (player, offset) => {
   pos[1] + offset[1] - radius > CANVAS_Y);
 };
 
+const drawCountdown = (context, time) => {
+  context.beginPath();
+  context.rect(20, 20, 100, 40);
+  context.fillStyle = 'white';
+  context.fill();
+  context.lineWidth = COUNTDOWN_WIDTH;
+  context.strokeStyle = BORDER_COLOR;
+  // context.stroke();
+
+  context.fillStyle = BORDER_COLOR;
+  context.font = "bold 24px Arial";
+
+  context.fillText(Math.floor(time) / 1000, 25, 45);
+};
+/* harmony export (immutable) */ __webpack_exports__["d"] = drawCountdown;
+
+
 const BG_COLOR = "#8bf1ff";
 const BORDER_WIDTH = 15;
+const COUNTDOWN_WIDTH = 5;
 const BORDER_COLOR = "#001f95";
 const GRADIENT_COLOR_ONE = "#11e80d";
 const GRADIENT_COLOR_TWO = "#0468ff";
@@ -212,8 +232,8 @@ class GameView {
   start(name) {
     this.bindKeyHandlers();
     this.setGameStartScreen(name);
-    this.lastTime = 0;
     this.currentPlayerId = __WEBPACK_IMPORTED_MODULE_0__server_util___default.a.randomId();
+    this.activateDireHitTime = null;
     this.playStatus = "playing";
     this.initialData = false;
 
@@ -226,6 +246,13 @@ class GameView {
     this.addRestartClickListener();
 
     this.socket.on("draw game", this.drawGame.bind(this));
+    this.socket.on("activate dire hit", this.startCountdown.bind(this));
+  }
+
+  startCountdown(data) {
+    if (data.id === this.currentPlayerId) {
+      this.activateDireHitTime = Date.now() + data.lag;
+    }
   }
 
   drawGame(data) {
@@ -238,8 +265,21 @@ class GameView {
       if (this.initialData) {
         const offset = this.getCurrentPlayerOffset(data);
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__game__["c" /* drawGame */])(this.context, offset, data);
+        this.handleDireHitCountdown();
       } else {
         this.checkInitialData(data);
+      }
+    }
+  }
+
+  handleDireHitCountdown() {
+    if (this.activateDireHitTime) {
+      const currentTime = Date.now();
+
+      if (this.activateDireHitTime < currentTime) {
+        this.activateDireHitTime = null;
+      } else {
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__game__["d" /* drawCountdown */])(this.context, this.activateDireHitTime - currentTime);
       }
     }
   }
@@ -373,7 +413,6 @@ class GameView {
   }
 
   activateDireHit() {
-    debugger
     this.socket.emit("dire hit player", { id: this.currentPlayerId });
   }
 }

@@ -1,5 +1,6 @@
 export const drawPlayer = (context, offset, data) => {
   drawPlayerOutline(context, offset, data);
+  drawPlayerName(context, offset, data);
 
   const img = new Image();
   img.onload = () => {
@@ -8,7 +9,9 @@ export const drawPlayer = (context, offset, data) => {
   img.src = data.img;
 
   drawPlayerImage(context, offset, data, img);
+};
 
+const drawPlayerName = (context, offset, data) => {
   context.fillStyle = PLAYER_INFO_COLOR;
   context.font = "bold 14px Arial";
   context.fillText(
@@ -43,7 +46,6 @@ const drawPlayerOutline = (context, offset, data) => {
   context.stroke();
 };
 
-const NORMAL_FRAME_TIME_DELTA = 1000 / 60;
 const PLAYER_INFO_COLOR = "#000";
 const DIRE_HIT_COLOR = "#ff3d00";
 const NORMAL_OUTLINE_WIDTH = 5;

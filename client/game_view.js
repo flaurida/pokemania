@@ -1,5 +1,5 @@
 import Util from '../server/util';
-import { drawGame, CANVAS_X, CANVAS_Y } from './game';
+import { drawGame, drawCountdown, CANVAS_X, CANVAS_Y } from './game';
 
 class GameView {
   constructor(context, socket) {
@@ -14,8 +14,8 @@ class GameView {
   start(name) {
     this.bindKeyHandlers();
     this.setGameStartScreen(name);
-    this.lastTime = 0;
     this.currentPlayerId = Util.randomId();
+    this.activateDireHitTime = null;
     this.playStatus = "playing";
     this.initialData = false;
 
@@ -28,6 +28,13 @@ class GameView {
     this.addRestartClickListener();
 
     this.socket.on("draw game", this.drawGame.bind(this));
+    this.socket.on("activate dire hit", this.startCountdown.bind(this));
+  }
+
+  startCountdown(data) {
+    if (data.id === this.currentPlayerId) {
+      this.activateDireHitTime = Date.now() + data.lag;
+    }
   }
 
   drawGame(data) {
@@ -40,8 +47,21 @@ class GameView {
       if (this.initialData) {
         const offset = this.getCurrentPlayerOffset(data);
         drawGame(this.context, offset, data);
+        this.handleDireHitCountdown();
       } else {
         this.checkInitialData(data);
+      }
+    }
+  }
+
+  handleDireHitCountdown() {
+    if (this.activateDireHitTime) {
+      const currentTime = Date.now();
+
+      if (this.activateDireHitTime < currentTime) {
+        this.activateDireHitTime = null;
+      } else {
+        drawCountdown(this.context, this.activateDireHitTime - currentTime);
       }
     }
   }
@@ -175,7 +195,6 @@ class GameView {
   }
 
   activateDireHit() {
-    debugger
     this.socket.emit("dire hit player", { id: this.currentPlayerId });
   }
 }

@@ -13,7 +13,7 @@ canvas {
   border-radius: 10px;
 }
 
-#start-screen, .links-container {
+#start-screen, #restart-screen, .links-container {
   margin: 20px auto;
   background: #8bf1ff;
   width: 80%;
@@ -80,9 +80,23 @@ input[type="text"]:focus {
   transition: background 0.5s;
 }
 
+#restart-button {
+  justify-content: center;
+  width: 80%;
+  margin: 10px auto;
+}
+
+#restart-screen {
+  padding: 15px;
+}
+
 .button > img {
   height: 45px;
   margin: 0 10px 0 20%;
+}
+
+#restart-button > img {
+  margin-left: 0;
 }
 
 .button:last-child {
@@ -100,7 +114,7 @@ input[type="text"]:focus {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(144, 144, 144, 0.66);
+  background: rgba(91, 91, 91, 0.8);
   z-index: 1;
 }
 
@@ -135,8 +149,12 @@ a:hover {
 }
 
 @media screen and (max-width: 650px) {
-  #start-screen, .links-container {
+  #start-screen, #restart-screen, .links-container {
     width: 100%;
+  }
+
+  #restart-button {
+    width: 90%;
   }
 
   h1 {

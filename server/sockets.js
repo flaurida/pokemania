@@ -70,7 +70,11 @@ class Sockets {
   onDireHitPlayer(data) {
     if (!this.game) return;
     const player = this.game.findHumanPlayer(data.id);
-    if (player) player.activateDireHit();
+    if (player && !player.activatingDireHit) {
+      player.activateDireHit();
+      this.socket.emit("activate dire hit",
+        { id: player.id, lag: player.direHitDelay() });
+    }
   }
 }
 
