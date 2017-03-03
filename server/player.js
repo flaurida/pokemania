@@ -74,10 +74,11 @@ class Player {
 
   isOverlappingWith(pos) {
     const centerDist = Util.dist(this.pos, pos);
-    return centerDist < (this.radius + 15);
+    return centerDist < (this.radius + 50);
   }
 
   handleCollision(otherPlayer) {
+    console.log(this.name + " X " + otherPlayer.name);
     if (this.radius > otherPlayer.radius) {
       this.radius += otherPlayer.radius / 2;
       otherPlayer.remove();

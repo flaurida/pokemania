@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>Pokémania!</title>
-
+    <link rel="icon" type="image/png" href="assets/img/favicon.png">
     <link rel="stylesheet" href="assets/reset.css" />
     <link rel="stylesheet" href="assets/pokemania.css" />
   </head>
@@ -11,14 +11,26 @@
     <canvas id="game-canvas" class="hidden" width="800" height="600"></canvas>
 
     <div id="start-screen">
-      <h1>Welcome to Pokémania!</h1>
+      <img src="assets/img/pokemania.png" class="pokemania-logo"/>
+      <h1>A multiplayer quest to find the world's strongest Pokémon</h1>
 
-      <div class="start-form">
-        <label for="name-input">Enter your name: </label>
-        <br />
-        <input type="text" id="name-input" />
-        <br />
-        <button id="start-button">Start Training!</button>
+      <div class="welcome">
+        <div class="start-form">
+          <label for="name-input">First, what is your name?</label>
+          <br />
+          <input type="text" id="name-input" placeholder="Misty"/>
+          <br />
+          <div class="button" id="start-button">
+            <img src="assets/img/pokeball.png" />
+            Start Training!
+          </div>
+          <div class="button" id="instructions-button">
+            <img src="assets/img/pokeball.png" />
+            Instructions
+          </div>
+        </div>
+
+        <img src="assets/img/eevee.png" class="eevee"/>
       </div>
     </div>
 

@@ -1,3 +1,109 @@
+body {
+  background-image: url('img/pokemon-wallpaper.png');
+}
+
 .hidden {
   display: none;
+}
+
+#start-screen {
+  margin: 20px auto;
+  background: #2ff9ed;
+  width: 80%;
+  max-width: 600px;
+  border: 5px solid black;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+#start-screen > h1 {
+  font-size: 36px;
+  text-align: center;
+}
+
+.pokemania-logo {
+  width: 100%;
+}
+
+.welcome {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.eevee {
+  margin-left: -65px;
+}
+
+.start-form {
+  padding: 20px 0;
+  width: 50%;
+  text-align: center;
+}
+
+.start-form > * {
+  width: 100%;
+  height: 50px;
+  margin: 5px 0;
+  font-size: 18px;
+}
+
+input[type="text"] {
+  padding-left: 20px;
+  box-sizing: border-box;
+}
+
+input[type="text"]:focus {
+  outline: 3px solid red;
+}
+
+.button {
+  background: blue;
+  color: white;
+  line-height: 50px;
+  display: flex;
+  align-items: center;
+  transition: background 0.5s;
+}
+
+.button > img {
+  height: 45px;
+  margin: 0 10px 0 20%;
+}
+
+.button:last-child {
+  margin-top: 10px;
+}
+
+.button:hover {
+  cursor: pointer;
+  background: #0420b5;
+}
+
+@media screen and (max-width: 650px) {
+  #start-screen {
+    width: 100%;
+  }
+
+  #start-screen > h1 {
+    font-size: 24px;
+  }
+
+  .start-form {
+    width: 60%;
+    margin-left: 5px;
+  }
+
+  .welcome {
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .eevee {
+    width: 55%;
+  }
+
+  .button > img {
+    margin-left: 10%;
+  }
 }

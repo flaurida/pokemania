@@ -1,4 +1,10 @@
-body, input, h1 {
+body, input, h1, h2, h3, label, input, form, button, img {
   margin: 0;
   padding: 0;
+  border: 0;
+  font-family: Arial;
+}
+
+input:focus {
+  outline: none;
 }

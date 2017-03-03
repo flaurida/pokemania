@@ -29,22 +29,25 @@ class GameView {
   }
 
   drawGame(data) {
-    this.resetIfLost(data);
+    if (this.playStatus === "restartScreen") return;
 
     if (this.playStatus === "playing") {
+      if (this.resetIfLost(data)) return;
       this.powerCurrentPlayer();
       const offset = this.getCurrentPlayerOffset(data);
       drawGame(this.context, offset, data);
-    } else if (this.playStatus === "restartScreen") {
-      this.setGameRestartScreen();
     }
   }
 
   resetIfLost(data) {
-    if (!data[this.currentPlayerId] && this.playStatus === "playing") {
+    if (!data[this.currentPlayerId]) {
       this.currentPlayerId = null;
+      this.setGameRestartScreen();
       this.playStatus = "restartScreen";
+      return true;
     }
+
+    return false;
   }
 
   addStartClickListener() {

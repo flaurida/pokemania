@@ -198,22 +198,25 @@ class GameView {
   }
 
   drawGame(data) {
-    this.resetIfLost(data);
+    if (this.playStatus === "restartScreen") return;
 
     if (this.playStatus === "playing") {
+      if (this.resetIfLost(data)) return;
       this.powerCurrentPlayer();
       const offset = this.getCurrentPlayerOffset(data);
       __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__game__["c" /* drawGame */])(this.context, offset, data);
-    } else if (this.playStatus === "restartScreen") {
-      this.setGameRestartScreen();
     }
   }
 
   resetIfLost(data) {
-    if (!data[this.currentPlayerId] && this.playStatus === "playing") {
+    if (!data[this.currentPlayerId]) {
       this.currentPlayerId = null;
+      this.setGameRestartScreen();
       this.playStatus = "restartScreen";
+      return true;
     }
+
+    return false;
   }
 
   addStartClickListener() {
