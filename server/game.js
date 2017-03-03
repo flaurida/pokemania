@@ -36,7 +36,7 @@ class Game {
 
   addNewHumanPlayer(name, id) {
     const humanPlayer = new HumanPlayer({
-      pos: this.randomPos(),
+      pos: this.randomPos(true),
       game: this,
       name: name,
       id: id,
@@ -71,9 +71,16 @@ class Game {
     return this.humanPlayers.includes(player);
   }
 
+  refillIfNeeded(n) {
+    if (this.humanPlayers.length + this.computerPlayers.length < n) {
+      this.addComputerPlayers(n);
+    }
+  }
+
   step(timeDelta) {
     this.moveObjects(timeDelta);
     this.checkCollisions();
+    this.refillIfNeeded(10);
     return this.parsePlayerData();
   }
 
@@ -126,11 +133,37 @@ class Game {
       (pos[0] > Game.DIM_X - radius) || (pos[1] > Game.DIM_Y - radius);
   }
 
-  randomPos() {
-    return [
-      (Game.DIM_X - 50) * Math.random() + 25,
-      (Game.DIM_Y - 50) * Math.random() + 25
-    ];
+  randomPos(humanPlayer = false) {
+    let randomPos = [this.randomCoord("x"), this.randomCoord("y")];
+    if (!humanPlayer) return randomPos;
+
+    const allPlayers = this.allPlayers();
+    let overlap = this.checkForOverlap(allPlayers, randomPos);
+
+    while (overlap) {
+      randomPos = [this.randomCoord("x"), this.randomCoord("y")];
+      overlap = this.checkForOverlap(allPlayers, randomPos);
+    }
+
+    return randomPos;
+  }
+
+  checkForOverlap(allPlayers, pos) {
+    for (let i = 0; i < allPlayers.length; i++) {
+      const otherPlayer = allPlayers[i];
+
+      if (otherPlayer.isOverlappingWith(pos)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  randomCoord(coord) {
+    if (coord === "x") return (Game.DIM_X - 50) * Math.random() + 25;
+    else if (coord === "y") return (Game.DIM_Y - 50) * Math.random() + 25;
+    return null;
   }
 
   removePlayer(player) {

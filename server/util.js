@@ -49,6 +49,7 @@ const POKEMON_IDS = [
 const POKEMON_CHARACTER_NAMES = [
   "Misty",
   "Lass",
+  "Beauty",
   "Serena",
   "Bonnie",
   "Iris",

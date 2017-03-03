@@ -32,7 +32,7 @@ class Player {
 
   move(timeDelta) {
     this.evolve();
-    
+
     const velocityScale = timeDelta / NORMAL_FRAME_TIME_DELTA,
       sizeScale = (Util.DEFAULT_RADIUS / this.radius - 1) / 4,
       deltaX = this.velocity[0] * velocityScale * (1 + sizeScale),
@@ -70,6 +70,11 @@ class Player {
   isCollidedWith(otherPlayer) {
     const centerDist = Util.dist(this.pos, otherPlayer.pos);
     return centerDist < (this.radius + otherPlayer.radius);
+  }
+
+  isOverlappingWith(pos) {
+    const centerDist = Util.dist(this.pos, pos);
+    return centerDist < (this.radius + 15);
   }
 
   handleCollision(otherPlayer) {
