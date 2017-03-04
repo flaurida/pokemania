@@ -236,6 +236,7 @@ class GameView {
     this.activateDireHitTime = null;
     this.playStatus = "playing";
     this.initialData = false;
+    this.lastActivityTime = Date.now();
 
     this.socket.emit("new player", { name: this.name, id: this.currentPlayerId });
   }
@@ -266,10 +267,24 @@ class GameView {
         const offset = this.getCurrentPlayerOffset(data);
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__game__["c" /* drawGame */])(this.context, offset, data);
         this.handleDireHitCountdown();
+        this.handleInactivity();
       } else {
         this.checkInitialData(data);
       }
     }
+  }
+
+  handleInactivity() {
+    if (this.isInactive()) {
+      this.socket.emit("inactive player", { id: this.currentPlayerId });
+      this.currentPlayerId = null;
+      this.setInactiveScreen();
+      this.playStatus = "restartScreen";
+    }
+  }
+
+  isInactive() {
+    return (Date.now() > this.lastActivityTime + 30000);
   }
 
   handleDireHitCountdown() {
@@ -303,6 +318,7 @@ class GameView {
 
   addStartClickListener() {
     const startButton = document.getElementById("start-button");
+
     startButton.onclick = () => {
       this.name = document.getElementById("name-input").value;
       if (this.name.length > 25) this.name = "";
@@ -311,10 +327,15 @@ class GameView {
   }
 
   addRestartClickListener() {
-    const restartButton = document.getElementById("restart-button");
-    restartButton.onclick = () => {
-      this.start(this.name);
-    };
+    const restartButtons = document.getElementsByClassName("restart-button");
+
+    for (let i = 0; i < restartButtons.length; i++) {
+      let restartButton = restartButtons[i];
+
+      restartButton.onclick = () => {
+        this.start(this.name);
+      };
+    }
   }
 
   setGameStartScreen() {
@@ -322,11 +343,13 @@ class GameView {
     const startScreen = document.getElementById("start-screen");
     const restartScreen = document.getElementById("restart-screen");
     const instructions = document.getElementById("instructions");
+    const inactiveScreen = document.getElementById("inactive-screen");
 
     canvas.className = "";
     startScreen.className = "hidden";
     restartScreen.className = "hidden";
-    instructions.className= "hidden";
+    instructions.className = "hidden";
+    inactiveScreen.className = "hidden";
   }
 
   setGameRestartScreen() {
@@ -334,11 +357,13 @@ class GameView {
     const startScreen = document.getElementById("start-screen");
     const restartScreen = document.getElementById("restart-screen");
     const instructions = document.getElementById("instructions");
+    const inactiveScreen = document.getElementById("inactive-screen");
 
     canvas.className = "hidden";
     startScreen.className = "hidden";
     restartScreen.className = "";
     instructions.className= "hidden";
+    inactiveScreen.className = "hidden";
   }
 
   setInstructionsScreen() {
@@ -346,11 +371,27 @@ class GameView {
     const startScreen = document.getElementById("start-screen");
     const restartScreen = document.getElementById("restart-screen");
     const instructions = document.getElementById("instructions");
+    const inactiveScreen = document.getElementById("inactive-screen");
 
     canvas.className = "hidden";
     startScreen.className = "";
     restartScreen.className = "hidden";
     instructions.classList.toggle("hidden");
+    inactiveScreen.className = "hidden";
+  }
+
+  setInactiveScreen() {
+    const canvas = document.getElementById("game-canvas");
+    const startScreen = document.getElementById("start-screen");
+    const restartScreen = document.getElementById("restart-screen");
+    const instructions = document.getElementById("instructions");
+    const inactiveScreen = document.getElementById("inactive-screen");
+
+    canvas.className = "hidden";
+    startScreen.className = "hidden";
+    restartScreen.className = "hidden";
+    instructions.className = "hidden";
+    inactiveScreen.className = "";
   }
 
   addInstructionsClickListener() {
@@ -390,6 +431,7 @@ class GameView {
     document.addEventListener('keydown', e => {
       if (e.key === " ") {
         this.activateDireHit();
+        this.lastActivityTime = Date.now();
       }
     });
   }
@@ -410,6 +452,7 @@ class GameView {
     if (GameView.KEYS.left) allImpulses.push([-impulse, 0]);
     if (GameView.KEYS.right) allImpulses.push([impulse, 0]);
 
+    if (allImpulses.length > 0) this.lastActivityTime = Date.now();
     this.socket.emit("move player", { id: this.currentPlayerId, impulses: allImpulses });
   }
 

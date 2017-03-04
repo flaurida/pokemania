@@ -17,6 +17,7 @@ class Sockets {
     client.on("new player", this.onNewPlayer.bind(this));
     client.on("move player", this.onMovePlayer.bind(this));
     client.on("dire hit player", this.onDireHitPlayer.bind(this));
+    client.on("inactive player", this.onInactivePlayer.bind(this));
   }
 
   onClientDisconnect() {
@@ -75,6 +76,12 @@ class Sockets {
       this.socket.emit("activate dire hit",
         { id: player.id, lag: player.direHitDelay() });
     }
+  }
+
+  onInactivePlayer(data) {
+    if (!this.game) return;
+    const player = this.game.findHumanPlayer(data.id);
+    if (player) this.game.removePlayer(player);
   }
 }
 

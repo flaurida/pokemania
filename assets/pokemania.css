@@ -13,7 +13,7 @@ canvas {
   border-radius: 10px;
 }
 
-#start-screen, #restart-screen, .links-container {
+#start-screen, #restart-screen, #inactive-screen, .links-container {
   margin: 20px auto;
   background: #8bf1ff;
   width: 80%;
@@ -23,7 +23,7 @@ canvas {
   box-sizing: border-box;
 }
 
-.sad-charmander {
+.sad-charmander, .sleeping-charizard {
   width: 100%;
 }
 
@@ -84,13 +84,13 @@ input[type="text"]:focus {
   transition: background 0.5s;
 }
 
-#restart-button {
+.restart-button {
   justify-content: center;
   width: 80%;
   margin: 10px auto;
 }
 
-#restart-screen {
+#restart-screen, #inactive-screen {
   padding: 15px;
 }
 
@@ -99,7 +99,7 @@ input[type="text"]:focus {
   margin: 0 10px 0 20%;
 }
 
-#restart-button > img {
+.restart-button > img {
   margin-left: 0;
 }
 
@@ -153,12 +153,16 @@ a:hover {
 }
 
 @media screen and (max-width: 650px) {
-  #start-screen, #restart-screen, .links-container {
+  #start-screen, #restart-screen, #inactive-screen, .links-container {
     width: 100%;
   }
 
-  #restart-button {
+  .restart-button {
     width: 90%;
+  }
+
+  #restart-screen, #inactive-screen {
+    padding: 10px;
   }
 
   h1 {
@@ -180,6 +184,6 @@ a:hover {
   }
 
   .button > img {
-    margin-left: 10%;
+    margin-left: 2%;
   }
 }
