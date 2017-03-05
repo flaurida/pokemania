@@ -13,7 +13,7 @@ canvas {
   border-radius: 10px;
 }
 
-#start-screen, #restart-screen, #inactive-screen, .links-container {
+#start-screen, #restart-screen, #inactive-screen, .notes-container {
   margin: 20px auto;
   background: #8bf1ff;
   width: 80%;
@@ -27,11 +27,20 @@ canvas {
   width: 100%;
 }
 
+.notes-container {
+  padding: 10px;
+  font-size: 18px;
+}
+
 .links-container {
   display: flex;
   justify-content: space-around;
-  padding: 10px;
-  font-size: 18px;
+}
+
+#instructions-reminder {
+  margin: 5px auto 10px;
+  font-weight: bold;
+  text-align: center;
 }
 
 h1 {
@@ -131,6 +140,11 @@ input[type="text"]:focus {
   border-radius: 5px;
 }
 
+.instructions-list {
+  width: 90%;
+  margin: 10px auto;
+}
+
 #instructions-body {
   max-width: 500px;
 }
@@ -199,12 +213,16 @@ a:hover {
 }
 
 @media screen and (max-width: 650px) {
-  #start-screen, #restart-screen, #inactive-screen, .links-container {
+  #start-screen, #restart-screen, #inactive-screen, .notes-container {
     width: 100%;
   }
 
   .restart-button {
     width: 90%;
+  }
+
+  .instructions-list {
+    width: 80%;
   }
 
   #restart-screen, #inactive-screen {
@@ -239,5 +257,9 @@ a:hover {
 
   #pokemon-list > li {
     width: 33.3333%;
+  }
+
+  #instructions-reminder {
+    font-size: 16px;
   }
 }
