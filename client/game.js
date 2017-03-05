@@ -1,12 +1,19 @@
 import { drawPlayer } from './player';
 
-export const drawGame = (context, offset, players) => {
+export const drawGame = (context, offset, players, loading = false) => {
   context.clearRect(0, 0, CANVAS_X, CANVAS_Y);
   context.fillStyle = BG_COLOR;
   context.fillRect(0, 0, CANVAS_X, CANVAS_Y);
 
-  drawBorder(context, offset);
+  if (loading) {
+    drawLoadingScreen(context);
+  } else {
+    drawGameBoard(context, offset);
+    drawPlayers(context, offset, players);
+  }
+};
 
+const drawPlayers = (context, offset, players) => {
   Object.values(players).forEach(player => {
     if (!outOfCanvasBounds(player, offset)) {
       drawPlayer(context, offset, player);
@@ -14,7 +21,14 @@ export const drawGame = (context, offset, players) => {
   });
 };
 
-const drawBorder = (context, offset) => {
+const drawLoadingScreen = context => {
+  context.fillStyle = BORDER_COLOR;
+  context.font = "bold 50px Arial";
+
+  context.fillText("Loading...", CANVAS_X / 2 - 110, CANVAS_Y / 2);
+};
+
+const drawGameBoard = (context, offset) => {
   context.strokeStyle = BORDER_COLOR;
   context.lineWidth = BORDER_WIDTH;
   context.strokeRect(offset[0], offset[1], DIM_X, DIM_Y);
@@ -44,7 +58,6 @@ export const drawCountdown = (context, time) => {
   context.fill();
   context.lineWidth = COUNTDOWN_WIDTH;
   context.strokeStyle = BORDER_COLOR;
-  // context.stroke();
 
   context.fillStyle = BORDER_COLOR;
   context.font = "bold 24px Arial";

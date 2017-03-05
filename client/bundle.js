@@ -74,23 +74,37 @@
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__player__ = __webpack_require__(2);
 
 
-const drawGame = (context, offset, players) => {
+const drawGame = (context, offset, players, loading = false) => {
   context.clearRect(0, 0, CANVAS_X, CANVAS_Y);
   context.fillStyle = BG_COLOR;
   context.fillRect(0, 0, CANVAS_X, CANVAS_Y);
 
-  drawBorder(context, offset);
+  if (loading) {
+    drawLoadingScreen(context);
+  } else {
+    drawGameBoard(context, offset);
+    drawPlayers(context, offset, players);
+  }
+};
+/* harmony export (immutable) */ __webpack_exports__["c"] = drawGame;
 
+
+const drawPlayers = (context, offset, players) => {
   Object.values(players).forEach(player => {
     if (!outOfCanvasBounds(player, offset)) {
       __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__player__["a" /* drawPlayer */])(context, offset, player);
     }
   });
 };
-/* harmony export (immutable) */ __webpack_exports__["c"] = drawGame;
 
+const drawLoadingScreen = context => {
+  context.fillStyle = BORDER_COLOR;
+  context.font = "bold 50px Arial";
 
-const drawBorder = (context, offset) => {
+  context.fillText("Loading...", CANVAS_X / 2 - 110, CANVAS_Y / 2);
+};
+
+const drawGameBoard = (context, offset) => {
   context.strokeStyle = BORDER_COLOR;
   context.lineWidth = BORDER_WIDTH;
   context.strokeRect(offset[0], offset[1], DIM_X, DIM_Y);
@@ -120,7 +134,6 @@ const drawCountdown = (context, time) => {
   context.fill();
   context.lineWidth = COUNTDOWN_WIDTH;
   context.strokeStyle = BORDER_COLOR;
-  // context.stroke();
 
   context.fillStyle = BORDER_COLOR;
   context.font = "bold 24px Arial";
@@ -206,6 +219,7 @@ class GameView {
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__game__["c" /* drawGame */])(this.context, offset, data);
         this.handleDireHitCountdown();
       } else {
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__game__["c" /* drawGame */])(this.context, null, data, true);
         this.checkInitialData(data);
       }
     }

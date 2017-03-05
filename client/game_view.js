@@ -50,6 +50,7 @@ class GameView {
         drawGame(this.context, offset, data);
         this.handleDireHitCountdown();
       } else {
+        drawGame(this.context, null, data, true);
         this.checkInitialData(data);
       }
     }
