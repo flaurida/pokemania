@@ -18,7 +18,6 @@ class GameView {
     this.activateDireHitTime = null;
     this.playStatus = "playing";
     this.initialData = false;
-    this.lastActivityTime = Date.now();
 
     this.socket.emit("new player", { name: this.name, id: this.currentPlayerId });
   }
@@ -30,6 +29,7 @@ class GameView {
 
     this.socket.on("draw game", this.drawGame.bind(this));
     this.socket.on("activate dire hit", this.startCountdown.bind(this));
+    this.socket.on("inactive player", this.handleInactivity.bind(this));
   }
 
   startCountdown(data) {
@@ -49,24 +49,10 @@ class GameView {
         const offset = this.getCurrentPlayerOffset(data);
         drawGame(this.context, offset, data);
         this.handleDireHitCountdown();
-        this.handleInactivity();
       } else {
         this.checkInitialData(data);
       }
     }
-  }
-
-  handleInactivity() {
-    if (this.isInactive()) {
-      this.socket.emit("inactive player", { id: this.currentPlayerId });
-      this.currentPlayerId = null;
-      this.setInactiveScreen();
-      this.playStatus = "restartScreen";
-    }
-  }
-
-  isInactive() {
-    return (Date.now() > this.lastActivityTime + 30000);
   }
 
   handleDireHitCountdown() {
@@ -199,12 +185,14 @@ class GameView {
 
       document.addEventListener('keydown', e => {
         if (e.key === key) {
+          e.preventDefault();
           GameView.KEYS[GameView.MOVES[key]] = true;
         }
       }, false);
 
       document.addEventListener('keyup', e => {
         if (e.key === key) {
+          e.preventDefault();
           GameView.KEYS[GameView.MOVES[key]] = false;
         }
       }, false);
@@ -212,8 +200,8 @@ class GameView {
 
     document.addEventListener('keydown', e => {
       if (e.key === " ") {
+        e.preventDefault();
         this.activateDireHit();
-        this.lastActivityTime = Date.now();
       }
     });
   }
@@ -234,12 +222,19 @@ class GameView {
     if (GameView.KEYS.left) allImpulses.push([-impulse, 0]);
     if (GameView.KEYS.right) allImpulses.push([impulse, 0]);
 
-    if (allImpulses.length > 0) this.lastActivityTime = Date.now();
     this.socket.emit("move player", { id: this.currentPlayerId, impulses: allImpulses });
   }
 
   activateDireHit() {
     this.socket.emit("dire hit player", { id: this.currentPlayerId });
+  }
+
+  handleInactivity(data) {
+    if (data.id === this.currentPlayerId) {
+      this.currentPlayerId = null;
+      this.playStatus === "restartScreen";
+      this.setInactiveScreen();
+    }
   }
 }
 

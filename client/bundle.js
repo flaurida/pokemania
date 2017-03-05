@@ -63,77 +63,15 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 6);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
-/* 0 */,
-/* 1 */
+/* 0 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-const drawPlayer = (context, offset, data) => {
-  drawPlayerOutline(context, offset, data);
-  drawPlayerName(context, offset, data);
-
-  const img = new Image();
-  img.onload = () => {
-    drawPlayerImage(context, offset, data, img);
-  };
-  img.src = data.img;
-
-  drawPlayerImage(context, offset, data, img);
-};
-/* harmony export (immutable) */ __webpack_exports__["a"] = drawPlayer;
-
-
-const drawPlayerName = (context, offset, data) => {
-  context.fillStyle = PLAYER_INFO_COLOR;
-  context.font = "bold 14px Arial";
-  context.fillText(
-    data.name,
-    data.pos[0] + offset[0] + data.radius + 3,
-    data.pos[1] + offset[1]
-  );
-};
-
-const drawPlayerImage = (context, offset, data, img) => {
-  context.drawImage(
-    img,
-    data.pos[0] + offset[0] - data.radius,
-    data.pos[1] + offset[1] - data.radius,
-    data.radius * 2,
-    data.radius * 2
-  );
-};
-
-const drawPlayerOutline = (context, offset, data) => {
-  context.beginPath();
-  context.arc(
-    data.pos[0] + offset[0],
-    data.pos[1] + offset[1],
-    data.radius,
-    0,
-    2 * Math.PI
-  );
-
-  context.lineWidth = data.direHit ? DIRE_HIT_OUTLINE_WIDTH : NORMAL_OUTLINE_WIDTH;
-  context.strokeStyle = data.direHit ? DIRE_HIT_COLOR : PLAYER_INFO_COLOR;
-  context.stroke();
-};
-
-const PLAYER_INFO_COLOR = "#000";
-const DIRE_HIT_COLOR = "#ff3d00";
-const NORMAL_OUTLINE_WIDTH = 5;
-const DIRE_HIT_OUTLINE_WIDTH = 10;
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__player__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__player__ = __webpack_require__(2);
 
 
 const drawGame = (context, offset, players) => {
@@ -203,19 +141,19 @@ const DIM_Y = 2000;
 const CANVAS_X = 800;
 /* harmony export (immutable) */ __webpack_exports__["a"] = CANVAS_X;
 
-const CANVAS_Y = 550;
+const CANVAS_Y = 500;
 /* harmony export (immutable) */ __webpack_exports__["b"] = CANVAS_Y;
 
 
 
 /***/ }),
-/* 3 */
+/* 1 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__server_util__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__server_util__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__server_util___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__server_util__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game__ = __webpack_require__(0);
 
 
 
@@ -236,7 +174,6 @@ class GameView {
     this.activateDireHitTime = null;
     this.playStatus = "playing";
     this.initialData = false;
-    this.lastActivityTime = Date.now();
 
     this.socket.emit("new player", { name: this.name, id: this.currentPlayerId });
   }
@@ -248,6 +185,7 @@ class GameView {
 
     this.socket.on("draw game", this.drawGame.bind(this));
     this.socket.on("activate dire hit", this.startCountdown.bind(this));
+    this.socket.on("inactive player", this.handleInactivity.bind(this));
   }
 
   startCountdown(data) {
@@ -267,24 +205,10 @@ class GameView {
         const offset = this.getCurrentPlayerOffset(data);
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__game__["c" /* drawGame */])(this.context, offset, data);
         this.handleDireHitCountdown();
-        this.handleInactivity();
       } else {
         this.checkInitialData(data);
       }
     }
-  }
-
-  handleInactivity() {
-    if (this.isInactive()) {
-      this.socket.emit("inactive player", { id: this.currentPlayerId });
-      this.currentPlayerId = null;
-      this.setInactiveScreen();
-      this.playStatus = "restartScreen";
-    }
-  }
-
-  isInactive() {
-    return (Date.now() > this.lastActivityTime + 30000);
   }
 
   handleDireHitCountdown() {
@@ -417,12 +341,14 @@ class GameView {
 
       document.addEventListener('keydown', e => {
         if (e.key === key) {
+          e.preventDefault();
           GameView.KEYS[GameView.MOVES[key]] = true;
         }
       }, false);
 
       document.addEventListener('keyup', e => {
         if (e.key === key) {
+          e.preventDefault();
           GameView.KEYS[GameView.MOVES[key]] = false;
         }
       }, false);
@@ -430,8 +356,8 @@ class GameView {
 
     document.addEventListener('keydown', e => {
       if (e.key === " ") {
+        e.preventDefault();
         this.activateDireHit();
-        this.lastActivityTime = Date.now();
       }
     });
   }
@@ -452,12 +378,19 @@ class GameView {
     if (GameView.KEYS.left) allImpulses.push([-impulse, 0]);
     if (GameView.KEYS.right) allImpulses.push([impulse, 0]);
 
-    if (allImpulses.length > 0) this.lastActivityTime = Date.now();
     this.socket.emit("move player", { id: this.currentPlayerId, impulses: allImpulses });
   }
 
   activateDireHit() {
     this.socket.emit("dire hit player", { id: this.currentPlayerId });
+  }
+
+  handleInactivity(data) {
+    if (data.id === this.currentPlayerId) {
+      this.currentPlayerId = null;
+      this.playStatus === "restartScreen";
+      this.setInactiveScreen();
+    }
   }
 }
 
@@ -479,32 +412,68 @@ GameView.KEYS = {
 
 
 /***/ }),
-/* 4 */,
-/* 5 */,
-/* 6 */
+/* 2 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_view__ = __webpack_require__(3);
+const drawPlayer = (context, offset, data) => {
+  drawPlayerOutline(context, offset, data);
+  drawPlayerName(context, offset, data);
+
+  const img = new Image();
+  img.onload = () => {
+    drawPlayerImage(context, offset, data, img);
+  };
+  img.src = data.img;
+
+  drawPlayerImage(context, offset, data, img);
+};
+/* harmony export (immutable) */ __webpack_exports__["a"] = drawPlayer;
 
 
+const drawPlayerName = (context, offset, data) => {
+  context.fillStyle = PLAYER_INFO_COLOR;
+  context.font = "bold 14px Arial";
+  context.fillText(
+    data.name,
+    data.pos[0] + offset[0] + data.radius + 3,
+    data.pos[1] + offset[1]
+  );
+};
 
-document.addEventListener("DOMContentLoaded", () => {
-  const canvas = document.getElementById("game-canvas");
-  canvas.width = __WEBPACK_IMPORTED_MODULE_0__game__["a" /* CANVAS_X */];
-  canvas.height = __WEBPACK_IMPORTED_MODULE_0__game__["b" /* CANVAS_Y */];
+const drawPlayerImage = (context, offset, data, img) => {
+  context.drawImage(
+    img,
+    data.pos[0] + offset[0] - data.radius,
+    data.pos[1] + offset[1] - data.radius,
+    data.radius * 2,
+    data.radius * 2
+  );
+};
 
-  const context = canvas.getContext("2d");
-  const socket = io();
+const drawPlayerOutline = (context, offset, data) => {
+  context.beginPath();
+  context.arc(
+    data.pos[0] + offset[0],
+    data.pos[1] + offset[1],
+    data.radius,
+    0,
+    2 * Math.PI
+  );
 
-  const gameView = new __WEBPACK_IMPORTED_MODULE_1__game_view__["a" /* default */](context, socket);
-});
+  context.lineWidth = data.direHit ? DIRE_HIT_OUTLINE_WIDTH : NORMAL_OUTLINE_WIDTH;
+  context.strokeStyle = data.direHit ? DIRE_HIT_COLOR : PLAYER_INFO_COLOR;
+  context.stroke();
+};
+
+const PLAYER_INFO_COLOR = "#000";
+const DIRE_HIT_COLOR = "#ff3d00";
+const NORMAL_OUTLINE_WIDTH = 5;
+const DIRE_HIT_OUTLINE_WIDTH = 10;
 
 
 /***/ }),
-/* 7 */
+/* 3 */
 /***/ (function(module, exports) {
 
 const Util = {
@@ -592,6 +561,29 @@ const POKEMON_CHARACTER_NAMES = [
 ];
 
 module.exports = Util;
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_view__ = __webpack_require__(1);
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const canvas = document.getElementById("game-canvas");
+  canvas.width = __WEBPACK_IMPORTED_MODULE_0__game__["a" /* CANVAS_X */];
+  canvas.height = __WEBPACK_IMPORTED_MODULE_0__game__["b" /* CANVAS_Y */];
+
+  const context = canvas.getContext("2d");
+  const socket = io();
+
+  const gameView = new __WEBPACK_IMPORTED_MODULE_1__game_view__["a" /* default */](context, socket);
+});
 
 
 /***/ })

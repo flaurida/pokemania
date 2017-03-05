@@ -13,6 +13,7 @@ class Player {
     this.id = options.id || Util.randomId();
     this.direHit = false;
     this.activatingDireHit = false;
+    this.lastActivityTime = options.lastActivityTime || null;
   }
 
   direHitDelay() {

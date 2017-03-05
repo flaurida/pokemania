@@ -61,4 +61,4 @@ const GRADIENT_COLOR_TWO = "#0468ff";
 const DIM_X = 2000;
 const DIM_Y = 2000;
 export const CANVAS_X = 800;
-export const CANVAS_Y = 550;
+export const CANVAS_Y = 500;

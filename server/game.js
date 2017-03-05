@@ -41,6 +41,7 @@ class Game {
       name: name,
       id: id,
       radius: Util.DEFAULT_RADIUS,
+      lastActivityTime: Date.now()
     });
 
     this.addPlayer(humanPlayer);
@@ -77,11 +78,28 @@ class Game {
     }
   }
 
-  step(timeDelta) {
+  step(timeDelta, currentTime) {
     this.moveObjects(timeDelta);
     this.checkCollisions();
     this.refillIfNeeded(10);
-    return this.parsePlayerData();
+
+    return {
+      playerData: this.parsePlayerData(),
+      inactivityData: this.removeInactivePlayers(currentTime)
+    };
+  }
+
+  removeInactivePlayers(currentTime) {
+    const inactivityData = [];
+
+    this.humanPlayers.forEach(humanPlayer => {
+      if (currentTime - humanPlayer.lastActivityTime > INACTIVE_THRESHOLD) {
+        inactivityData.push(humanPlayer.id);
+        this.removePlayer(humanPlayer);
+      }
+    });
+
+    return inactivityData;
   }
 
   parsePlayerData() {
@@ -183,7 +201,6 @@ class Game {
 
 Game.DIM_X = 2000;
 Game.DIM_Y = 2000;
-Game.CANVAS_X = 700;
-Game.CANVAS_Y = 450;
+const INACTIVE_THRESHOLD = 30000;
 
 module.exports = Game;

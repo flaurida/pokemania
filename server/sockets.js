@@ -17,7 +17,6 @@ class Sockets {
     client.on("new player", this.onNewPlayer.bind(this));
     client.on("move player", this.onMovePlayer.bind(this));
     client.on("dire hit player", this.onDireHitPlayer.bind(this));
-    client.on("inactive player", this.onInactivePlayer.bind(this));
   }
 
   onClientDisconnect() {
@@ -40,11 +39,19 @@ class Sockets {
 
   stepCurrentGame() {
     if (this.closeGameIfNeeded()) return;
-    const nextTime = Date.now();
-    const timeDelta = nextTime - this.lastTime;
-    const data = this.game.step(timeDelta);
-    this.socket.emit("draw game", data);
-    this.lastTime = nextTime;
+    const currentTime = Date.now();
+    const timeDelta = currentTime - this.lastTime;
+    const data = this.game.step(timeDelta, currentTime);
+
+    this.socket.emit("draw game", data.playerData);
+    this.notifyInactivePlayers(data.inactivityData);
+    this.lastTime = currentTime;
+  }
+
+  notifyInactivePlayers(inactivePlayerIds) {
+    inactivePlayerIds.forEach(inactivePlayerId => {
+      this.socket.emit("inactive player", { id: inactivePlayerId });
+    });
   }
 
   closeGameIfNeeded() {
@@ -76,12 +83,6 @@ class Sockets {
       this.socket.emit("activate dire hit",
         { id: player.id, lag: player.direHitDelay() });
     }
-  }
-
-  onInactivePlayer(data) {
-    if (!this.game) return;
-    const player = this.game.findHumanPlayer(data.id);
-    if (player) this.game.removePlayer(player);
   }
 }
 
