@@ -11,19 +11,27 @@ class GameView {
     this.setEventHandlers();
   }
 
-  start(name) {
+  start() {
     this.bindKeyHandlers();
-    this.setGameStartScreen(name);
+    this.activateScreen("playGame");
     this.currentPlayerId = Util.randomId();
     this.activateDireHitTime = null;
     this.playStatus = "playing";
     this.initialData = false;
 
-    this.socket.emit("new player", { name: this.name, id: this.currentPlayerId });
+    const pokemonId = this.selectedPokemonImage ?
+      parseInt(this.selectedPokemonImage.getAttribute("value")) : null;
+    debugger
+    this.socket.emit("new player", {
+      name: this.name,
+      pokemonId: pokemonId,
+      id: this.currentPlayerId
+    });
   }
 
   setEventHandlers() {
     this.addStartClickListener();
+    this.addSelectPokemonClickListener();
     this.addInstructionsClickListener();
     this.addRestartClickListener();
 
@@ -39,7 +47,7 @@ class GameView {
   }
 
   drawGame(data) {
-    if (this.playStatus === "restartScreen") return;
+    if (this.playStatus === "restart") return;
 
     if (this.playStatus === "playing") {
       if (this.resetIfLost(data)) return;
@@ -77,8 +85,8 @@ class GameView {
   resetIfLost(data) {
     if (!data[this.currentPlayerId] && this.initialData) {
       this.currentPlayerId = null;
-      this.setGameRestartScreen();
-      this.playStatus = "restartScreen";
+      this.activateScreen("restart");
+      this.playStatus = "restart";
       return true;
     }
 
@@ -89,9 +97,59 @@ class GameView {
     const startButton = document.getElementById("start-button");
 
     startButton.onclick = () => {
+      this.start();
+    };
+  }
+
+  addSelectPokemonClickListener() {
+    const selectPokemonButton = document.getElementById("select-pokemon-button");
+
+    selectPokemonButton.onclick = () => {
       this.name = document.getElementById("name-input").value;
       if (this.name.length > 25) this.name = "";
-      this.start(this.name);
+      this.addPokemonToSelectList();
+      this.activateScreen("selectPokemon");
+    };
+
+    const selectPokemon = document.getElementById("select-pokemon");
+    selectPokemon.onclick = () => {
+      this.activateScreen("selectPokemon");
+    };
+
+    const selectPokemonBody = document.getElementById("select-pokemon-body");
+    selectPokemonBody.onclick = e => {
+      e.stopPropagation();
+    };
+  }
+
+  addPokemonToSelectList() {
+    const pokemonList = document.getElementById("pokemon-list");
+
+    if (!pokemonList.firstChild) {
+      Util.POKEMON_IDS.forEach(pokemonId => {
+        const pokemonListItem = document.createElement("li");
+        const pokemonImage = document.createElement("img");
+
+        pokemonImage.src = `assets/img/pokemon-${pokemonId}.png`;
+        pokemonImage.className = "select-pokemon-img";
+        pokemonImage.setAttribute("value", pokemonId);
+        pokemonListItem.appendChild(pokemonImage);
+        this.bindPokemonSelectClickListener(pokemonImage);
+
+        pokemonList.appendChild(pokemonListItem);
+      });
+    }
+  }
+
+  bindPokemonSelectClickListener(pokemonImage) {
+    pokemonImage.onclick = () => {
+      pokemonImage.classList.toggle("select-pokemon-img-focus");
+
+      if (this.selectedPokemonImage) {
+        this.selectedPokemonImage.classList.toggle("select-pokemon-img-focus");
+      }
+
+      this.selectedPokemonImage = pokemonImage;
     };
   }
 
@@ -102,76 +160,48 @@ class GameView {
       let restartButton = restartButtons[i];
 
       restartButton.onclick = () => {
-        this.start(this.name);
+        this.start();
       };
     }
   }
 
-  setGameStartScreen() {
+  activateScreen(type) {
     const canvas = document.getElementById("game-canvas");
     const startScreen = document.getElementById("start-screen");
     const restartScreen = document.getElementById("restart-screen");
     const instructions = document.getElementById("instructions");
     const inactiveScreen = document.getElementById("inactive-screen");
+    const selectPokemonScreen = document.getElementById("select-pokemon");
 
-    canvas.className = "";
-    startScreen.className = "hidden";
-    restartScreen.className = "hidden";
-    instructions.className = "hidden";
-    inactiveScreen.className = "hidden";
-  }
+    canvas.className = type === "playGame" ? "" : "hidden";
+    startScreen.className = type === "start" ||
+      type === "selectPokemon" ||
+      type === "instructions" ? "" : "hidden";
+    restartScreen.className = type === "restart" ? "" : "hidden";
+    inactiveScreen.className = type === "inactive" ? "" : "hidden";
 
-  setGameRestartScreen() {
-    const canvas = document.getElementById("game-canvas");
-    const startScreen = document.getElementById("start-screen");
-    const restartScreen = document.getElementById("restart-screen");
-    const instructions = document.getElementById("instructions");
-    const inactiveScreen = document.getElementById("inactive-screen");
+    if (type === "instructions") {
+      instructions.classList.toggle("hidden");
+    } else {
+      instructions.className = "hidden";
+    }
 
-    canvas.className = "hidden";
-    startScreen.className = "hidden";
-    restartScreen.className = "";
-    instructions.className= "hidden";
-    inactiveScreen.className = "hidden";
-  }
-
-  setInstructionsScreen() {
-    const canvas = document.getElementById("game-canvas");
-    const startScreen = document.getElementById("start-screen");
-    const restartScreen = document.getElementById("restart-screen");
-    const instructions = document.getElementById("instructions");
-    const inactiveScreen = document.getElementById("inactive-screen");
-
-    canvas.className = "hidden";
-    startScreen.className = "";
-    restartScreen.className = "hidden";
-    instructions.classList.toggle("hidden");
-    inactiveScreen.className = "hidden";
-  }
-
-  setInactiveScreen() {
-    const canvas = document.getElementById("game-canvas");
-    const startScreen = document.getElementById("start-screen");
-    const restartScreen = document.getElementById("restart-screen");
-    const instructions = document.getElementById("instructions");
-    const inactiveScreen = document.getElementById("inactive-screen");
-
-    canvas.className = "hidden";
-    startScreen.className = "hidden";
-    restartScreen.className = "hidden";
-    instructions.className = "hidden";
-    inactiveScreen.className = "";
+    if (type === "selectPokemon") {
+      selectPokemonScreen.classList.toggle("hidden");
+    } else {
+      selectPokemonScreen.className = "hidden";
+    }
   }
 
   addInstructionsClickListener() {
     const instructionsButton = document.getElementById("instructions-button");
     instructionsButton.onclick = () => {
-      this.setInstructionsScreen();
+      this.activateScreen("instructions");
     };
 
     const instructions = document.getElementById("instructions");
     instructions.onclick = () => {
-      this.setInstructionsScreen();
+      this.activateScreen("instructions");
     };
 
     const instructionsBody = document.getElementById("instructions-body");
@@ -233,8 +263,8 @@ class GameView {
   handleInactivity(data) {
     if (data.id === this.currentPlayerId) {
       this.currentPlayerId = null;
-      this.playStatus === "restartScreen";
-      this.setInactiveScreen();
+      this.playStatus === "restart";
+      this.activateScreen("inactive");
     }
   }
 }

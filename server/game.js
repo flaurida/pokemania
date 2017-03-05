@@ -34,11 +34,12 @@ class Game {
     }
   }
 
-  addNewHumanPlayer(name, id) {
+  addNewHumanPlayer(name, pokemonId, id) {
     const humanPlayer = new HumanPlayer({
       pos: this.randomPos(true),
       game: this,
       name: name,
+      pokemonId: pokemonId,
       id: id,
       radius: Util.DEFAULT_RADIUS,
       lastActivityTime: Date.now()

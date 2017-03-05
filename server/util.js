@@ -1,3 +1,7 @@
+const POKEMON_IDS = [
+  1, 4, 7, 24, 29, 34, 92, 112, 147, 152, 155, 158, 220, 304, 371
+];
+
 const Util = {
   dist(pos1, pos2) {
     return Math.sqrt(
@@ -39,12 +43,10 @@ const Util = {
     return text;
   },
 
-  DEFAULT_RADIUS: 15
-};
+  DEFAULT_RADIUS: 15,
 
-const POKEMON_IDS = [
-  1, 4, 7, 24, 29, 34, 92, 112, 147, 152, 155, 158, 220, 304, 371
-];
+  POKEMON_IDS: POKEMON_IDS
+};
 
 const POKEMON_CHARACTER_NAMES = [
   "Misty",

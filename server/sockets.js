@@ -28,7 +28,7 @@ class Sockets {
       this.startNewGame();
     }
 
-    this.game.addNewHumanPlayer(data.name, data.id);
+    this.game.addNewHumanPlayer(data.name, data.pokemonId, data.id);
   }
 
   startNewGame() {
