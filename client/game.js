@@ -14,9 +14,9 @@ export const drawGame = (context, offset, players, loading = false) => {
 };
 
 const drawPlayers = (context, offset, players) => {
-  Object.values(players).forEach(player => {
-    if (!outOfCanvasBounds(player, offset)) {
-      drawPlayer(context, offset, player);
+  Object.keys(players).forEach(playerId => {
+    if (!outOfCanvasBounds(players[playerId], offset)) {
+      drawPlayer(context, offset, players[playerId]);
     }
   });
 };
