@@ -118,4 +118,5 @@ Below is a screen shot of the start screen, which is rendered when a player firs
 ### Future Directions
 
 * Removing players who close their browser immediately instead of treating them the same way as inactive players and removing them after 30 seconds
+* Improve compatibility with Safari and IE
 * Multiple servers if the game gets too full
