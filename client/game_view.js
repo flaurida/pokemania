@@ -21,7 +21,7 @@ class GameView {
 
     const pokemonId = this.selectedPokemonImage ?
       parseInt(this.selectedPokemonImage.getAttribute("value")) : null;
-    debugger
+
     this.socket.emit("new player", {
       name: this.name,
       pokemonId: pokemonId,

@@ -119,12 +119,9 @@ const drawGameBoard = (context, offset) => {
 
 const outOfCanvasBounds = (player, offset) => {
   const pos = player.pos,
-    radius = player.radius;
+        radius = player.radius;
 
-  return (pos[0] + offset[0] + radius < 0 ||
-  pos[0] + offset[0] - radius > CANVAS_X ||
-  pos[1] + offset[1] + radius < 0 ||
-  pos[1] + offset[1] - radius > CANVAS_Y);
+  return pos[0] + offset[0] + radius < 0 || pos[0] + offset[0] - radius > CANVAS_X || pos[1] + offset[1] + radius < 0 || pos[1] + offset[1] - radius > CANVAS_Y;
 };
 
 const drawCountdown = (context, time) => {
@@ -158,7 +155,6 @@ const CANVAS_Y = 500;
 /* harmony export (immutable) */ __webpack_exports__["b"] = CANVAS_Y;
 
 
-
 /***/ }),
 /* 1 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -188,9 +184,8 @@ class GameView {
     this.playStatus = "playing";
     this.initialData = false;
 
-    const pokemonId = this.selectedPokemonImage ?
-      parseInt(this.selectedPokemonImage.getAttribute("value")) : null;
-    debugger
+    const pokemonId = this.selectedPokemonImage ? parseInt(this.selectedPokemonImage.getAttribute("value")) : null;
+
     this.socket.emit("new player", {
       name: this.name,
       pokemonId: pokemonId,
@@ -343,9 +338,7 @@ class GameView {
     const selectPokemonScreen = document.getElementById("select-pokemon");
 
     canvas.className = type === "playGame" ? "" : "hidden";
-    startScreen.className = type === "start" ||
-      type === "selectPokemon" ||
-      type === "instructions" ? "" : "hidden";
+    startScreen.className = type === "start" || type === "selectPokemon" || type === "instructions" ? "" : "hidden";
     restartScreen.className = type === "restart" ? "" : "hidden";
     inactiveScreen.className = type === "inactive" ? "" : "hidden";
 
@@ -407,10 +400,7 @@ class GameView {
   }
 
   getCurrentPlayerOffset(data) {
-    return [
-      __WEBPACK_IMPORTED_MODULE_1__game__["a" /* CANVAS_X */] / 2 - data[this.currentPlayerId].pos[0],
-      __WEBPACK_IMPORTED_MODULE_1__game__["b" /* CANVAS_Y */] / 2 - data[this.currentPlayerId].pos[1]
-    ];
+    return [__WEBPACK_IMPORTED_MODULE_1__game__["a" /* CANVAS_X */] / 2 - data[this.currentPlayerId].pos[0], __WEBPACK_IMPORTED_MODULE_1__game__["b" /* CANVAS_Y */] / 2 - data[this.currentPlayerId].pos[1]];
   }
 
   powerCurrentPlayer() {
@@ -454,7 +444,6 @@ GameView.KEYS = {
 
 /* harmony default export */ __webpack_exports__["a"] = GameView;
 
-
 /***/ }),
 /* 2 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -478,32 +467,16 @@ const drawPlayer = (context, offset, data) => {
 const drawPlayerName = (context, offset, data) => {
   context.fillStyle = PLAYER_INFO_COLOR;
   context.font = "bold 14px Arial";
-  context.fillText(
-    data.name,
-    data.pos[0] + offset[0] + data.radius + 3,
-    data.pos[1] + offset[1]
-  );
+  context.fillText(data.name, data.pos[0] + offset[0] + data.radius + 3, data.pos[1] + offset[1]);
 };
 
 const drawPlayerImage = (context, offset, data, img) => {
-  context.drawImage(
-    img,
-    data.pos[0] + offset[0] - data.radius,
-    data.pos[1] + offset[1] - data.radius,
-    data.radius * 2,
-    data.radius * 2
-  );
+  context.drawImage(img, data.pos[0] + offset[0] - data.radius, data.pos[1] + offset[1] - data.radius, data.radius * 2, data.radius * 2);
 };
 
 const drawPlayerOutline = (context, offset, data) => {
   context.beginPath();
-  context.arc(
-    data.pos[0] + offset[0],
-    data.pos[1] + offset[1],
-    data.radius,
-    0,
-    2 * Math.PI
-  );
+  context.arc(data.pos[0] + offset[0], data.pos[1] + offset[1], data.radius, 0, 2 * Math.PI);
 
   context.lineWidth = data.direHit ? DIRE_HIT_OUTLINE_WIDTH : NORMAL_OUTLINE_WIDTH;
   context.strokeStyle = data.direHit ? DIRE_HIT_COLOR : PLAYER_INFO_COLOR;
@@ -515,20 +488,15 @@ const DIRE_HIT_COLOR = "#ff3d00";
 const NORMAL_OUTLINE_WIDTH = 5;
 const DIRE_HIT_OUTLINE_WIDTH = 10;
 
-
 /***/ }),
 /* 3 */
 /***/ (function(module, exports) {
 
-const POKEMON_IDS = [
-  1, 4, 7, 24, 29, 34, 92, 112, 147, 152, 155, 158, 220, 304, 371
-];
+const POKEMON_IDS = [1, 4, 7, 24, 29, 34, 92, 112, 147, 152, 155, 158, 220, 304, 371];
 
 const Util = {
   dist(pos1, pos2) {
-    return Math.sqrt(
-      Math.pow(pos1[0] - pos2[0], 2) + Math.pow(pos1[1] - pos2[1], 2)
-    );
+    return Math.sqrt(Math.pow(pos1[0] - pos2[0], 2) + Math.pow(pos1[1] - pos2[1], 2));
   },
 
   randomRadius() {
@@ -536,10 +504,7 @@ const Util = {
   },
 
   randomVelocity() {
-    return [
-      this.randomVelocityPiece(),
-      this.randomVelocityPiece()
-    ];
+    return [this.randomVelocityPiece(), this.randomVelocityPiece()];
   },
 
   randomVelocityPiece() {
@@ -570,44 +535,9 @@ const Util = {
   POKEMON_IDS: POKEMON_IDS
 };
 
-const POKEMON_CHARACTER_NAMES = [
-  "Misty",
-  "Lass",
-  "Beauty",
-  "Serena",
-  "Bonnie",
-  "Iris",
-  "Jessie",
-  "Lillie",
-  "May",
-  "Dawn",
-  "Moon",
-  "Mallow",
-  "Sakura",
-  "Shauna",
-  "Candela",
-  "Officer Jenny",
-  "Aria",
-  "Olivia",
-  "Lusamine",
-  "Lana",
-  "Professor Ivy",
-  "Mom",
-  "Sabrina",
-  "Viola",
-  "Daisy",
-  "Bianca",
-  "Sumomo",
-  "Blanche",
-  "Agatha",
-  "Georgia",
-  "Grace",
-  "Malva",
-  "Karen"
-];
+const POKEMON_CHARACTER_NAMES = ["Misty", "Lass", "Beauty", "Serena", "Bonnie", "Iris", "Jessie", "Lillie", "May", "Dawn", "Moon", "Mallow", "Sakura", "Shauna", "Candela", "Officer Jenny", "Aria", "Olivia", "Lusamine", "Lana", "Professor Ivy", "Mom", "Sabrina", "Viola", "Daisy", "Bianca", "Sumomo", "Blanche", "Agatha", "Georgia", "Grace", "Malva", "Karen"];
 
 module.exports = Util;
-
 
 /***/ }),
 /* 4 */
@@ -630,7 +560,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const gameView = new __WEBPACK_IMPORTED_MODULE_1__game_view__["a" /* default */](context, socket);
 });
-
 
 /***/ })
 /******/ ]);
