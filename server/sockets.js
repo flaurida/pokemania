@@ -12,15 +12,14 @@ class Sockets {
   }
 
   onSocketConnection(client) {
-    console.log("New player has connected: " + client.id);
-    client.on("disconnect", this.onClientDisconnect.bind(this));
+    client.on("disconnect", () =>  { this.onClientDisconnect(client); });
     client.on("new player", this.onNewPlayer.bind(this));
     client.on("move player", this.onMovePlayer.bind(this));
     client.on("dire hit player", this.onDireHitPlayer.bind(this));
   }
 
-  onClientDisconnect() {
-    console.log("Player has disconnected: " + this.id);
+  onClientDisconnect(client) {
+    console.log("Player has disconnected: " + client.id);
   }
 
   onNewPlayer(data) {
