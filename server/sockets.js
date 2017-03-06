@@ -2,8 +2,8 @@ const HumanPlayer = require('./human_player');
 const Game = require('./game');
 
 class Sockets {
-  constructor(io, app) {
-    this.socket = io.listen(app);
+  constructor(io) {
+    this.socket = io;
     this.setEventHandlers();
   }
 
@@ -34,7 +34,7 @@ class Sockets {
   startNewGame() {
     this.game = new Game();
     this.lastTime = Date.now();
-    this.gameLoop = setInterval(this.stepCurrentGame.bind(this), 1000 / 60);
+    this.gameLoop = setInterval(this.stepCurrentGame.bind(this), REDRAW_RATE);
   }
 
   stepCurrentGame() {
@@ -85,5 +85,7 @@ class Sockets {
     }
   }
 }
+
+const REDRAW_RATE = 1000 / 120;
 
 module.exports = Sockets;

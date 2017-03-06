@@ -112,7 +112,8 @@ class Game {
         radius: player.radius,
         name: player.name,
         img: player.img,
-        direHit: player.direHit
+        direHit: player.direHit,
+        activatingDireHit: player.activatingDireHit
       };
     });
 
