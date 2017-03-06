@@ -1,6 +1,6 @@
 # Pokemania
 
-[Live Version](www.pokemania.site)
+[Live Version](http://www.pokemania.site)
 
 Pokemania is a multiplayer Javascript game built with a Node.js server and Socket.IO to provide real time updates.
 
