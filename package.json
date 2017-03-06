@@ -11,6 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "babel-core": "^6.23.1",
+    "babel-loader": "^6.3.2",
     "socket.io": "^1.7.3",
     "webpack": "^2.2.1"
   }
