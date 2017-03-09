@@ -95,6 +95,6 @@ class Sockets {
   }
 }
 
-const REDRAW_RATE = 1000 / 30;
+const REDRAW_RATE = 1000 / 20;
 
 module.exports = Sockets;
