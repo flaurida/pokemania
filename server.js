@@ -28,7 +28,7 @@ const handler = (req, res) => {
 };
 
 const app = require("http").createServer(handler);
-const io = require("socket.io")(app);
+const io = require("socket.io").listen(app);
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT);
