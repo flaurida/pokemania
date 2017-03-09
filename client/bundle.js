@@ -63,12 +63,11 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 495);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
-/******/ ({
-
-/***/ 131:
+/******/ ([
+/* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -79,7 +78,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.CANVAS_Y = exports.CANVAS_X = exports.drawCountdown = exports.drawGame = undefined;
 
-var _player = __webpack_require__(240);
+var _player = __webpack_require__(2);
 
 var drawGame = exports.drawGame = function drawGame(context, offset, players) {
   var loading = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
@@ -157,8 +156,7 @@ var CANVAS_X = exports.CANVAS_X = 800;
 var CANVAS_Y = exports.CANVAS_Y = 500;
 
 /***/ }),
-
-/***/ 206:
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -170,11 +168,11 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _util = __webpack_require__(241);
+var _util = __webpack_require__(3);
 
 var _util2 = _interopRequireDefault(_util);
 
-var _game = __webpack_require__(131);
+var _game = __webpack_require__(0);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -498,8 +496,7 @@ GameView.KEYS = {
 exports.default = GameView;
 
 /***/ }),
-
-/***/ 240:
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -582,8 +579,7 @@ var NORMAL_OUTLINE_WIDTH = 5;
 var DIRE_HIT_OUTLINE_WIDTH = 10;
 
 /***/ }),
-
-/***/ 241:
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -632,16 +628,15 @@ var POKEMON_CHARACTER_NAMES = ["Misty", "Lass", "Beauty", "Serena", "Bonnie", "I
 module.exports = Util;
 
 /***/ }),
-
-/***/ 495:
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _game = __webpack_require__(131);
+var _game = __webpack_require__(0);
 
-var _game_view = __webpack_require__(206);
+var _game_view = __webpack_require__(1);
 
 var _game_view2 = _interopRequireDefault(_game_view);
 
@@ -659,6 +654,5 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 /***/ })
-
-/******/ });
+/******/ ]);
 //# sourceMappingURL=bundle.js.map
