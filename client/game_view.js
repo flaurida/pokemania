@@ -1,9 +1,12 @@
 import Util from '../server/util';
-import { drawGame, drawCountdown, CANVAS_X, CANVAS_Y } from './game';
+import Game from './game';
+import StaticAssets from './static_assets';
 
 class GameView {
   constructor(context, socket) {
     this.context = context;
+    this.staticAssets = new StaticAssets(this.receiveLoadedImages.bind(this));
+    this.game = new Game(this.context, this.staticAssets);
     this.socket = socket;
     this.currentPlayerId = null;
     this.playStatus = "startScreen";
@@ -13,20 +16,25 @@ class GameView {
 
   start() {
     this.bindKeyHandlers();
+    this.currentPlayerId = this.currentPlayerId || Util.randomId();
+    this.game.setCurrentPlayerId(this.currentPlayerId);
     this.activateScreen("playGame");
-    this.currentPlayerId = Util.randomId();
     this.activateDireHitTime = null;
     this.playStatus = "playing";
     this.initialData = false;
 
     const pokemonId = this.selectedPokemonImage ?
-      parseInt(this.selectedPokemonImage.getAttribute("value")) : null;
+      parseInt(this.selectedPokemonImage.getAttribute("data")) : null;
 
     this.socket.emit("new player", {
       name: this.name,
       pokemonId: pokemonId,
       id: this.currentPlayerId
     });
+  }
+
+  receiveLoadedImages() {
+    this.imgLoaded = true;
   }
 
   setEventHandlers() {
@@ -53,12 +61,12 @@ class GameView {
       if (this.resetIfLost(data)) return;
       this.powerCurrentPlayer();
 
-      if (this.initialData) {
+      if (this.initialData && this.imgLoaded) {
         const offset = this.getCurrentPlayerOffset(data);
-        drawGame(this.context, offset, data);
+        this.game.draw(offset, data);
         this.handleDireHitCountdown();
       } else {
-        drawGame(this.context, null, data, true);
+        this.game.draw(null, data, true);
         this.checkInitialData(data);
       }
     }
@@ -71,7 +79,7 @@ class GameView {
       if (this.activateDireHitTime < currentTime) {
         this.activateDireHitTime = null;
       } else {
-        drawCountdown(this.context, this.activateDireHitTime - currentTime);
+        this.game.drawCountdown(this.activateDireHitTime - currentTime);
       }
     }
   }
@@ -84,7 +92,6 @@ class GameView {
 
   resetIfLost(data) {
     if (!data[this.currentPlayerId] && this.initialData) {
-      this.currentPlayerId = null;
       this.activateScreen("restart");
       this.playStatus = "restart";
       return true;
@@ -129,10 +136,12 @@ class GameView {
       Util.POKEMON_IDS.forEach(pokemonId => {
         const pokemonListItem = document.createElement("li");
         const pokemonImage = document.createElement("img");
+        const pokemonUrl = `assets/img/pokemon-${pokemonId}.png`;
+        pokemonImage.src = pokemonUrl;
 
-        pokemonImage.src = `assets/img/pokemon-${pokemonId}.png`;
+        this.staticAssets.addLoadedImage(pokemonUrl, pokemonImage);
         pokemonImage.className = "select-pokemon-img";
-        pokemonImage.setAttribute("value", pokemonId);
+        pokemonImage.data = pokemonId;
         pokemonListItem.appendChild(pokemonImage);
         this.bindPokemonSelectClickListener(pokemonImage);
 
@@ -239,8 +248,8 @@ class GameView {
 
   getCurrentPlayerOffset(data) {
     return [
-      CANVAS_X / 2 - data[this.currentPlayerId].pos[0],
-      CANVAS_Y / 2 - data[this.currentPlayerId].pos[1]
+      Game.CANVAS_X / 2 - data[this.currentPlayerId].pos[0],
+      Game.CANVAS_Y / 2 - data[this.currentPlayerId].pos[1]
     ];
   }
 
@@ -253,7 +262,10 @@ class GameView {
     if (GameView.KEYS.left) allImpulses.push([-impulse, 0]);
     if (GameView.KEYS.right) allImpulses.push([impulse, 0]);
 
-    this.socket.emit("move player", { id: this.currentPlayerId, impulses: allImpulses });
+    this.socket.emit(
+      "move player",
+      { id: this.currentPlayerId, impulses: allImpulses }
+    );
   }
 
   activateDireHit() {

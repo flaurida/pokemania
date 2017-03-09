@@ -1,107 +1,153 @@
-export const drawPlayer = (context, offset, data) => {
-  drawPlayerName(context, offset, data);
+class Player {
+  constructor(context, data, staticAssets, currentPlayer = false) {
+    this.context = context;
+    this.staticAssets = staticAssets;
+    this.currentPlayer = currentPlayer;
 
-  const img = new Image();
-  img.onload = () => {
-    drawPlayerImage(context, offset, data, img);
-  };
-  img.src = data.img;
-
-  drawPlayerOutline(context, offset, data);
-  drawPlayerImage(context, offset, data, img);
-};
-
-const drawPlayerName = (context, offset, data) => {
-  context.fillStyle = PLAYER_INFO_COLOR;
-  context.font = "bold 14px Arial";
-  context.fillText(
-    data.name,
-    data.pos[0] + offset[0] + data.radius + 3,
-    data.pos[1] + offset[1]
-  );
-};
-
-const drawPlayerImage = (context, offset, data, img) => {
-  context.drawImage(
-    img,
-    data.pos[0] + offset[0] - data.radius,
-    data.pos[1] + offset[1] - data.radius,
-    data.radius * 2,
-    data.radius * 2
-  );
-};
-
-const drawPlayerOutline = (context, offset, data) => {
-  if (data.direHit) drawPlayerDireHit(context, offset, data);
-
-  context.beginPath();
-  context.arc(
-    data.pos[0] + offset[0],
-    data.pos[1] + offset[1],
-    data.radius,
-    0,
-    2 * Math.PI
-  );
-
-  context.lineWidth = NORMAL_OUTLINE_WIDTH;
-  context.strokeStyle = PLAYER_INFO_COLOR;
-  context.stroke();
-
-  if (data.activatingDireHit || data.direHit) {
-    drawDireHitOutline(context, offset, data);
+    this.imgLoaded = false;
+    this.fetchImage(data.img);
   }
-};
 
-const drawDireHitOutline = (context, offset, data) => {
-  context.beginPath();
-  context.arc(
-    data.pos[0] + offset[0],
-    data.pos[1] + offset[1],
-    data.radius + NORMAL_OUTLINE_WIDTH * 0.75,
-    0,
-    2 * Math.PI
-  );
+  fetchImage(url) {
+    if (this.currentPlayer && url === "assets/img/egg.png") {
+      url = "assets/img/current_player_egg.png";
+    }
 
-  context.lineWidth = NORMAL_OUTLINE_WIDTH * 0.75;
-  context.strokeStyle = DIRE_HIT_COLOR;
-  context.stroke();
-};
+    if (this.staticAssets.images[url]) {
+      this.img = this.staticAssets.images[url];
+      this.imgLoaded = true;
+    } else {
+      this.loadImage(url);
+    }
+  }
 
-const drawPlayerDireHit = (context, offset, data) => {
-  context.beginPath();
-  context.fillStyle = SPIKES_COLOR;
-  context.fillRect(
-    data.pos[0] + offset[0] - data.radius - DIRE_HIT_OUTLINE_WIDTH / 2 + 2,
-    data.pos[1] + offset[1] - data.radius - DIRE_HIT_OUTLINE_WIDTH / 2 + 2,
-    data.radius * 2 + DIRE_HIT_OUTLINE_WIDTH - 4,
-    data.radius * 2 + DIRE_HIT_OUTLINE_WIDTH - 4
-  );
+  loadImage(url) {
+    this.img = new Image();
 
-  drawRotatedSquare(context, offset, data);
-};
+    this.img.onload = () => {
+      this.imgLoaded = true;
+      this.staticAssets.addLoadedImage(url, this.img);
+    };
 
-const drawRotatedSquare = (context, offset, data) => {
-  context.save();
+    this.img.src = url;
+  }
 
-  context.translate(
-    data.pos[0] + offset[0],
-    data.pos[1] + offset[1]
-  );
+  resetImage(url) {
+    this.imgLoaded = false;
+    this.fetchImage(url);
+  }
 
-  context.rotate(Math.PI / 4);
-  context.fillStyle = SPIKES_COLOR;
-  context.fillRect(
-    -(data.radius + DIRE_HIT_OUTLINE_WIDTH / 2) + 2,
-    -(data.radius + DIRE_HIT_OUTLINE_WIDTH / 2) + 2,
-    data.radius * 2 + DIRE_HIT_OUTLINE_WIDTH - 4,
-    data.radius * 2 + DIRE_HIT_OUTLINE_WIDTH - 4
-  );
+  checkNewImage(url) {
+    if (!this.img.src.includes(url)) {
+      this.resetImage(url);
+    }
+  }
 
-  context.restore();
-};
+  draw(offset, data) {
+    this.checkNewImage(data.img);
+    this.drawName(offset, data);
+    this.drawOutline(offset, data);
 
-const PLAYER_INFO_COLOR = "#000";
-const DIRE_HIT_COLOR = "#ff3d00";
-const SPIKES_COLOR = "#fffc00";
-const NORMAL_OUTLINE_WIDTH = 5;
-const DIRE_HIT_OUTLINE_WIDTH = 10;
+    if (this.imgLoaded) {
+      this.drawImage(offset, data);
+    }
+  }
+
+  drawName(offset, data) {
+    this.context.fillStyle = Player.PLAYER_INFO_COLOR;
+    this.context.font = "bold 14px Arial";
+
+    this.context.fillText(
+      data.name,
+      data.pos[0] + offset[0] + data.radius + 3,
+      data.pos[1] + offset[1]
+    );
+  }
+
+  drawImage(offset, data) {
+    this.context.drawImage(
+      this.img,
+      data.pos[0] + offset[0] - data.radius,
+      data.pos[1] + offset[1] - data.radius,
+      data.radius * 2,
+      data.radius * 2
+    );
+  }
+
+  drawOutline(offset, data) {
+    if (data.direHit) this.drawDireHit(offset, data);
+
+    this.context.beginPath();
+    this.context.arc(
+      data.pos[0] + offset[0],
+      data.pos[1] + offset[1],
+      data.radius,
+      0,
+      2 * Math.PI
+    );
+
+    this.context.lineWidth = Player.NORMAL_OUTLINE_WIDTH;
+    this.context.strokeStyle = Player.PLAYER_INFO_COLOR;
+    this.context.stroke();
+
+    if (data.activatingDireHit || data.direHit) {
+      this.drawDireHitOutline(offset, data);
+    }
+  }
+
+  drawDireHitOutline(offset, data) {
+    this.context.beginPath();
+    this.context.arc(
+      data.pos[0] + offset[0],
+      data.pos[1] + offset[1],
+      data.radius + Player.NORMAL_OUTLINE_WIDTH * 0.75,
+      0,
+      2 * Math.PI
+    );
+
+    this.context.lineWidth = Player.NORMAL_OUTLINE_WIDTH * 0.75;
+    this.context.strokeStyle = Player.DIRE_HIT_COLOR;
+    this.context.stroke();
+  }
+
+  drawDireHit(offset, data) {
+    this.context.beginPath();
+    this.context.fillStyle = Player.SPIKES_COLOR;
+    this.context.fillRect(
+      data.pos[0] + offset[0] - data.radius - Player.DIRE_HIT_OUTLINE_WIDTH / 2 + 2,
+      data.pos[1] + offset[1] - data.radius - Player.DIRE_HIT_OUTLINE_WIDTH / 2 + 2,
+      data.radius * 2 + Player.DIRE_HIT_OUTLINE_WIDTH - 4,
+      data.radius * 2 + Player.DIRE_HIT_OUTLINE_WIDTH - 4
+    );
+
+    this.drawRotatedSquare(offset, data);
+  }
+
+  drawRotatedSquare(offset, data) {
+    this.context.save();
+
+    this.context.translate(
+      data.pos[0] + offset[0],
+      data.pos[1] + offset[1]
+    );
+
+    this.context.rotate(Math.PI / 4);
+    this.context.fillStyle = Player.SPIKES_COLOR;
+    this.context.fillRect(
+      -(data.radius + Player.DIRE_HIT_OUTLINE_WIDTH / 2) + 2,
+      -(data.radius + Player.DIRE_HIT_OUTLINE_WIDTH / 2) + 2,
+      data.radius * 2 + Player.DIRE_HIT_OUTLINE_WIDTH - 4,
+      data.radius * 2 + Player.DIRE_HIT_OUTLINE_WIDTH - 4
+    );
+
+    this.context.restore();
+  }
+}
+
+Player.PLAYER_INFO_COLOR = "#000";
+Player.DIRE_HIT_COLOR = "#ff3d00";
+Player.SPIKES_COLOR = "#fffc00";
+Player.NORMAL_OUTLINE_WIDTH = 5;
+Player.DIRE_HIT_OUTLINE_WIDTH = 10;
+
+export default Player;

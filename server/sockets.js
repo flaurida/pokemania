@@ -5,6 +5,7 @@ class Sockets {
   constructor(io) {
     this.socket = io;
     this.setEventHandlers();
+    this.humanPlayerIds = {};
   }
 
   setEventHandlers() {
@@ -12,22 +13,31 @@ class Sockets {
   }
 
   onSocketConnection(client) {
-    client.on("disconnect", () =>  { this.onClientDisconnect(client); });
-    client.on("new player", this.onNewPlayer.bind(this));
+    client.on("disconnect", () => { this.onClientDisconnect(client); });
+    client.on("new player", this.onNewPlayer(client));
     client.on("move player", this.onMovePlayer.bind(this));
     client.on("dire hit player", this.onDireHitPlayer.bind(this));
   }
 
   onClientDisconnect(client) {
-    console.log("Player has disconnected: " + client.id);
+    if (this.game) {
+      this.game.removePlayer(this.humanPlayerIds[client.id]);
+    }
   }
 
-  onNewPlayer(data) {
-    if (!this.game) {
-      this.startNewGame();
-    }
+  onNewPlayer(client) {
+    return data => {
+      if (!this.game) {
+        this.startNewGame();
+      }
 
-    this.game.addNewHumanPlayer(data.name, data.pokemonId, data.id);
+      const humanPlayer = this.game.addNewHumanPlayer(
+        data.name,
+        data.pokemonId,
+        data.id);
+
+      this.humanPlayerIds[client.id] = humanPlayer;
+    };
   }
 
   startNewGame() {

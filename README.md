@@ -41,14 +41,14 @@ In my [Sockets class](./server/sockets.js) I then define what functions should b
 
 ```javascript
 onSocketConnection(client) {
-  client.on("disconnect", () =>  { this.onClientDisconnect(client); });
-  client.on("new player", this.onNewPlayer.bind(this));
+  client.on("disconnect", () => { this.onClientDisconnect(client); });
+  client.on("new player", this.onNewPlayer(client));
   client.on("move player", this.onMovePlayer.bind(this));
   client.on("dire hit player", this.onDireHitPlayer.bind(this));
 }
 ```
 
-On the opposite side of the coin, I also use Socket.IO to notify the client when certain things happen. For example, below is a method that notifies an inactive player that they have been removed from the game. The client then receives this notices and changes the view accordingly (by switching to the sleeping Charizard view). I also send updates of the game state to the client on an interval in a similar fashion.
+On the opposite side of the coin, I also use Socket.IO to notify the client when certain things happen. For example, below is a method that notifies an inactive player that they have been removed from the game. The client then receives this notices and changes the view accordingly (by switching to the sleeping Charizard view). I also send updates of the game state to the client on an interval in a similar fashion. Note that players who disconnect voluntarily (such as by closing the window) are removed immediately from the server.
 
 ```javascript
 notifyInactivePlayers(inactivePlayerIds) {
@@ -115,8 +115,27 @@ addStartClickListener() {
 Below is a screen shot of the start screen, which is rendered when a player first visits the site.
 ![pokemania start screen](./docs/start_screen.png)
 
+### Storing Static Assets
+
+Because images are so important to this game, I include a [StaticAssets class](./client/static_assets.js) to load and then store common images (such as the egg and background images) when a player visits the page. In addition, whenever an image that is not loaded initially is later loaded (such as when a player evolves or when a player views the select Pokemon screen), it is also stored in the StaticAssets instance associated with a particular client. This ensures that an image is loaded at most one time. Below is the code to load original images and then notify the game view that images have been loaded so it can draw the game.
+
+```javascript
+addImage(url) {
+  this.images[url] = new Image();
+
+  this.images[url].onload = () => {
+    this.loadedCount++;
+
+    if (this.checkAllLoaded()) {
+      this.notifyCallback();
+    }
+  };
+
+  this.images[url].src = url;
+}
+```
+
 ### Future Directions
 
-* Removing players who close their browser immediately instead of treating them the same way as inactive players and removing them after 30 seconds
 * Improve compatibility with Safari and IE
 * Multiple servers if the game gets too full

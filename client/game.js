@@ -1,77 +1,122 @@
-import { drawPlayer } from './player';
+import Player from './player';
 
-export const drawGame = (context, offset, players, loading = false) => {
-  context.clearRect(0, 0, CANVAS_X, CANVAS_Y);
-  context.fillStyle = BG_COLOR;
-  context.fillRect(0, 0, CANVAS_X, CANVAS_Y);
+class Game {
+  constructor(context, staticAssets) {
+    this.context = context;
+    this.players = {};
+    this.staticAssets = staticAssets;
 
-  if (loading) {
-    drawLoadingScreen(context);
-  } else {
-    drawGameBoard(context, offset);
-    drawPlayers(context, offset, players);
+    this.draw = this.draw.bind(this);
   }
-};
 
-const drawPlayers = (context, offset, players) => {
-  Object.keys(players).forEach(playerId => {
-    if (!outOfCanvasBounds(players[playerId], offset)) {
-      drawPlayer(context, offset, players[playerId]);
+  draw(offset, players, loading = false) {
+    this.context.clearRect(0, 0, Game.CANVAS_X, Game.CANVAS_Y);
+    this.context.fillStyle = Game.BG_COLOR;
+    this.context.fillRect(0, 0, Game.CANVAS_X, Game.CANVAS_Y);
+
+    if (loading) {
+      this.drawLoadingScreen();
+    } else {
+      this.drawBoard(offset);
+      this.drawPlayers(offset, players);
     }
-  });
-};
+  }
 
-const drawLoadingScreen = context => {
-  context.fillStyle = BORDER_COLOR;
-  context.font = "bold 50px Arial";
+  drawPlayers(offset, players) {
+    Object.keys(players).forEach(playerId => {
+      const player = players[playerId];
 
-  context.fillText("Loading...", CANVAS_X / 2 - 110, CANVAS_Y / 2);
-};
+      if (!this.outOfCanvasBounds(player, offset)) {
+        const currentPlayer = playerId === this.currentPlayerId;
+        this.drawOrInitializePlayer(offset, player, playerId, currentPlayer);
+      }
+    });
+  }
 
-const drawGameBoard = (context, offset) => {
-  context.strokeStyle = BORDER_COLOR;
-  context.lineWidth = BORDER_WIDTH;
-  context.strokeRect(offset[0], offset[1], DIM_X, DIM_Y);
-  context.stroke();
+  drawOrInitializePlayer(offset, player, playerId, currentPlayer) {
+    if (this.players[playerId]) {
+      this.players[playerId].draw(offset, player);
+    } else {
+      this.players[playerId] = new Player(
+        this.context,
+        player,
+        this.staticAssets,
+        currentPlayer
+      );
+    }
+  }
 
-  const gradient = context.createLinearGradient(offset[0], offset[1], DIM_X / 2, DIM_Y / 2);
-  gradient.addColorStop(0, GRADIENT_COLOR_ONE);
-  gradient.addColorStop(1, GRADIENT_COLOR_TWO);
-  context.fillStyle = gradient;
-  context.fillRect(offset[0], offset[1], DIM_X, DIM_Y);
-};
+  drawLoadingScreen() {
+    this.context.fillStyle = Game.BORDER_COLOR;
+    this.context.font = "bold 50px Arial";
 
-const outOfCanvasBounds = (player, offset) => {
-  const pos = player.pos,
+    this.context.fillText(
+      "Loading...",
+      Game.CANVAS_X / 2 - 110,
+      Game.CANVAS_Y / 2
+    );
+  }
+
+  drawBoard(offset) {
+    this.context.save();
+    this.context.translate(offset[0], offset[1]);
+
+    this.context.strokeStyle = Game.BORDER_COLOR;
+    this.context.lineWidth = Game.BORDER_WIDTH;
+    this.context.rect(0, 0, Game.DIM_X, Game.DIM_Y);
+    this.context.stroke();
+
+    this.context.fillStyle = Game.GRASS_COLOR;
+    this.context.fill();
+
+    const pattern = this.context.createPattern(
+      this.staticAssets.images["assets/img/grass.png"],
+      "repeat"
+    );
+    this.context.fillStyle = pattern;
+    this.context.fill();
+
+    this.context.restore();
+  }
+
+  outOfCanvasBounds(player, offset) {
+    const pos = player.pos,
     radius = player.radius;
 
-  return (pos[0] + offset[0] + radius < 0 ||
-  pos[0] + offset[0] - radius > CANVAS_X ||
-  pos[1] + offset[1] + radius < 0 ||
-  pos[1] + offset[1] - radius > CANVAS_Y);
-};
+    return (pos[0] + offset[0] + radius < 0 ||
+      pos[0] + offset[0] - radius > Game.CANVAS_X ||
+      pos[1] + offset[1] + radius < 0 ||
+      pos[1] + offset[1] - radius > Game.CANVAS_Y
+    );
+  }
 
-export const drawCountdown = (context, time) => {
-  context.beginPath();
-  context.rect(20, 20, 100, 40);
-  context.fillStyle = 'white';
-  context.fill();
-  context.lineWidth = COUNTDOWN_WIDTH;
-  context.strokeStyle = BORDER_COLOR;
+  drawCountdown(time) {
+    this.context.beginPath();
+    this.context.rect(20, 20, 100, 40);
+    this.context.fillStyle = 'white';
+    this.context.fill();
+    this.context.lineWidth = Game.COUNTDOWN_WIDTH;
+    this.context.strokeStyle = Game.BORDER_COLOR;
 
-  context.fillStyle = BORDER_COLOR;
-  context.font = "bold 24px Arial";
+    this.context.fillStyle = Game.BORDER_COLOR;
+    this.context.font = "bold 24px Arial";
 
-  context.fillText(Math.floor(time) / 1000, 25, 45);
-};
+    this.context.fillText(Math.floor(time) / 1000, 25, 45);
+  }
 
-const BG_COLOR = "#8bf1ff";
-const BORDER_WIDTH = 15;
-const COUNTDOWN_WIDTH = 5;
-const BORDER_COLOR = "#001f95";
-const GRADIENT_COLOR_ONE = "#11e80d";
-const GRADIENT_COLOR_TWO = "#0468ff";
-const DIM_X = 2000;
-const DIM_Y = 2000;
-export const CANVAS_X = 800;
-export const CANVAS_Y = 500;
+  setCurrentPlayerId(playerId) {
+    this.currentPlayerId = playerId;
+  }
+}
+
+Game.BG_COLOR = "#8bf1ff";
+Game.BORDER_WIDTH = 15;
+Game.COUNTDOWN_WIDTH = 5;
+Game.BORDER_COLOR = "#001f95";
+Game.GRASS_COLOR = "#88ddb1";
+Game.DIM_X = 2000;
+Game.DIM_Y = 2000;
+Game.CANVAS_X = 800;
+Game.CANVAS_Y = 500;
+
+export default Game;

@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 5);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -76,84 +76,139 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.CANVAS_Y = exports.CANVAS_X = exports.drawCountdown = exports.drawGame = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _player = __webpack_require__(2);
 
-var drawGame = exports.drawGame = function drawGame(context, offset, players) {
-  var loading = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+var _player2 = _interopRequireDefault(_player);
 
-  context.clearRect(0, 0, CANVAS_X, CANVAS_Y);
-  context.fillStyle = BG_COLOR;
-  context.fillRect(0, 0, CANVAS_X, CANVAS_Y);
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-  if (loading) {
-    drawLoadingScreen(context);
-  } else {
-    drawGameBoard(context, offset);
-    drawPlayers(context, offset, players);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Game = function () {
+  function Game(context, staticAssets) {
+    _classCallCheck(this, Game);
+
+    this.context = context;
+    this.players = {};
+    this.staticAssets = staticAssets;
+
+    this.draw = this.draw.bind(this);
   }
-};
 
-var drawPlayers = function drawPlayers(context, offset, players) {
-  Object.keys(players).forEach(function (playerId) {
-    if (!outOfCanvasBounds(players[playerId], offset)) {
-      (0, _player.drawPlayer)(context, offset, players[playerId]);
+  _createClass(Game, [{
+    key: "draw",
+    value: function draw(offset, players) {
+      var loading = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+      this.context.clearRect(0, 0, Game.CANVAS_X, Game.CANVAS_Y);
+      this.context.fillStyle = Game.BG_COLOR;
+      this.context.fillRect(0, 0, Game.CANVAS_X, Game.CANVAS_Y);
+
+      if (loading) {
+        this.drawLoadingScreen();
+      } else {
+        this.drawBoard(offset);
+        this.drawPlayers(offset, players);
+      }
     }
-  });
-};
+  }, {
+    key: "drawPlayers",
+    value: function drawPlayers(offset, players) {
+      var _this = this;
 
-var drawLoadingScreen = function drawLoadingScreen(context) {
-  context.fillStyle = BORDER_COLOR;
-  context.font = "bold 50px Arial";
+      Object.keys(players).forEach(function (playerId) {
+        var player = players[playerId];
 
-  context.fillText("Loading...", CANVAS_X / 2 - 110, CANVAS_Y / 2);
-};
+        if (!_this.outOfCanvasBounds(player, offset)) {
+          var currentPlayer = playerId === _this.currentPlayerId;
+          _this.drawOrInitializePlayer(offset, player, playerId, currentPlayer);
+        }
+      });
+    }
+  }, {
+    key: "drawOrInitializePlayer",
+    value: function drawOrInitializePlayer(offset, player, playerId, currentPlayer) {
+      if (this.players[playerId]) {
+        this.players[playerId].draw(offset, player);
+      } else {
+        this.players[playerId] = new _player2.default(this.context, player, this.staticAssets, currentPlayer);
+      }
+    }
+  }, {
+    key: "drawLoadingScreen",
+    value: function drawLoadingScreen() {
+      this.context.fillStyle = Game.BORDER_COLOR;
+      this.context.font = "bold 50px Arial";
 
-var drawGameBoard = function drawGameBoard(context, offset) {
-  context.strokeStyle = BORDER_COLOR;
-  context.lineWidth = BORDER_WIDTH;
-  context.strokeRect(offset[0], offset[1], DIM_X, DIM_Y);
-  context.stroke();
+      this.context.fillText("Loading...", Game.CANVAS_X / 2 - 110, Game.CANVAS_Y / 2);
+    }
+  }, {
+    key: "drawBoard",
+    value: function drawBoard(offset) {
+      this.context.save();
+      this.context.translate(offset[0], offset[1]);
 
-  var gradient = context.createLinearGradient(offset[0], offset[1], DIM_X / 2, DIM_Y / 2);
-  gradient.addColorStop(0, GRADIENT_COLOR_ONE);
-  gradient.addColorStop(1, GRADIENT_COLOR_TWO);
-  context.fillStyle = gradient;
-  context.fillRect(offset[0], offset[1], DIM_X, DIM_Y);
-};
+      this.context.strokeStyle = Game.BORDER_COLOR;
+      this.context.lineWidth = Game.BORDER_WIDTH;
+      this.context.rect(0, 0, Game.DIM_X, Game.DIM_Y);
+      this.context.stroke();
 
-var outOfCanvasBounds = function outOfCanvasBounds(player, offset) {
-  var pos = player.pos,
-      radius = player.radius;
+      this.context.fillStyle = Game.GRASS_COLOR;
+      this.context.fill();
 
-  return pos[0] + offset[0] + radius < 0 || pos[0] + offset[0] - radius > CANVAS_X || pos[1] + offset[1] + radius < 0 || pos[1] + offset[1] - radius > CANVAS_Y;
-};
+      var pattern = this.context.createPattern(this.staticAssets.images["assets/img/grass.png"], "repeat");
+      this.context.fillStyle = pattern;
+      this.context.fill();
 
-var drawCountdown = exports.drawCountdown = function drawCountdown(context, time) {
-  context.beginPath();
-  context.rect(20, 20, 100, 40);
-  context.fillStyle = 'white';
-  context.fill();
-  context.lineWidth = COUNTDOWN_WIDTH;
-  context.strokeStyle = BORDER_COLOR;
+      this.context.restore();
+    }
+  }, {
+    key: "outOfCanvasBounds",
+    value: function outOfCanvasBounds(player, offset) {
+      var pos = player.pos,
+          radius = player.radius;
 
-  context.fillStyle = BORDER_COLOR;
-  context.font = "bold 24px Arial";
+      return pos[0] + offset[0] + radius < 0 || pos[0] + offset[0] - radius > Game.CANVAS_X || pos[1] + offset[1] + radius < 0 || pos[1] + offset[1] - radius > Game.CANVAS_Y;
+    }
+  }, {
+    key: "drawCountdown",
+    value: function drawCountdown(time) {
+      this.context.beginPath();
+      this.context.rect(20, 20, 100, 40);
+      this.context.fillStyle = 'white';
+      this.context.fill();
+      this.context.lineWidth = Game.COUNTDOWN_WIDTH;
+      this.context.strokeStyle = Game.BORDER_COLOR;
 
-  context.fillText(Math.floor(time) / 1000, 25, 45);
-};
+      this.context.fillStyle = Game.BORDER_COLOR;
+      this.context.font = "bold 24px Arial";
 
-var BG_COLOR = "#8bf1ff";
-var BORDER_WIDTH = 15;
-var COUNTDOWN_WIDTH = 5;
-var BORDER_COLOR = "#001f95";
-var GRADIENT_COLOR_ONE = "#11e80d";
-var GRADIENT_COLOR_TWO = "#0468ff";
-var DIM_X = 2000;
-var DIM_Y = 2000;
-var CANVAS_X = exports.CANVAS_X = 800;
-var CANVAS_Y = exports.CANVAS_Y = 500;
+      this.context.fillText(Math.floor(time) / 1000, 25, 45);
+    }
+  }, {
+    key: "setCurrentPlayerId",
+    value: function setCurrentPlayerId(playerId) {
+      this.currentPlayerId = playerId;
+    }
+  }]);
+
+  return Game;
+}();
+
+Game.BG_COLOR = "#8bf1ff";
+Game.BORDER_WIDTH = 15;
+Game.COUNTDOWN_WIDTH = 5;
+Game.BORDER_COLOR = "#001f95";
+Game.GRASS_COLOR = "#88ddb1";
+Game.DIM_X = 2000;
+Game.DIM_Y = 2000;
+Game.CANVAS_X = 800;
+Game.CANVAS_Y = 500;
+
+exports.default = Game;
 
 /***/ }),
 /* 1 */
@@ -168,11 +223,17 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _util = __webpack_require__(3);
+var _util = __webpack_require__(4);
 
 var _util2 = _interopRequireDefault(_util);
 
 var _game = __webpack_require__(0);
+
+var _game2 = _interopRequireDefault(_game);
+
+var _static_assets = __webpack_require__(3);
+
+var _static_assets2 = _interopRequireDefault(_static_assets);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -183,6 +244,8 @@ var GameView = function () {
     _classCallCheck(this, GameView);
 
     this.context = context;
+    this.staticAssets = new _static_assets2.default(this.receiveLoadedImages.bind(this));
+    this.game = new _game2.default(this.context, this.staticAssets);
     this.socket = socket;
     this.currentPlayerId = null;
     this.playStatus = "startScreen";
@@ -194,19 +257,25 @@ var GameView = function () {
     key: 'start',
     value: function start() {
       this.bindKeyHandlers();
+      this.currentPlayerId = this.currentPlayerId || _util2.default.randomId();
+      this.game.setCurrentPlayerId(this.currentPlayerId);
       this.activateScreen("playGame");
-      this.currentPlayerId = _util2.default.randomId();
       this.activateDireHitTime = null;
       this.playStatus = "playing";
       this.initialData = false;
 
-      var pokemonId = this.selectedPokemonImage ? parseInt(this.selectedPokemonImage.getAttribute("value")) : null;
+      var pokemonId = this.selectedPokemonImage ? parseInt(this.selectedPokemonImage.getAttribute("data")) : null;
 
       this.socket.emit("new player", {
         name: this.name,
         pokemonId: pokemonId,
         id: this.currentPlayerId
       });
+    }
+  }, {
+    key: 'receiveLoadedImages',
+    value: function receiveLoadedImages() {
+      this.imgLoaded = true;
     }
   }, {
     key: 'setEventHandlers',
@@ -236,12 +305,12 @@ var GameView = function () {
         if (this.resetIfLost(data)) return;
         this.powerCurrentPlayer();
 
-        if (this.initialData) {
+        if (this.initialData && this.imgLoaded) {
           var offset = this.getCurrentPlayerOffset(data);
-          (0, _game.drawGame)(this.context, offset, data);
+          this.game.draw(offset, data);
           this.handleDireHitCountdown();
         } else {
-          (0, _game.drawGame)(this.context, null, data, true);
+          this.game.draw(null, data, true);
           this.checkInitialData(data);
         }
       }
@@ -255,7 +324,7 @@ var GameView = function () {
         if (this.activateDireHitTime < currentTime) {
           this.activateDireHitTime = null;
         } else {
-          (0, _game.drawCountdown)(this.context, this.activateDireHitTime - currentTime);
+          this.game.drawCountdown(this.activateDireHitTime - currentTime);
         }
       }
     }
@@ -270,7 +339,6 @@ var GameView = function () {
     key: 'resetIfLost',
     value: function resetIfLost(data) {
       if (!data[this.currentPlayerId] && this.initialData) {
-        this.currentPlayerId = null;
         this.activateScreen("restart");
         this.playStatus = "restart";
         return true;
@@ -324,10 +392,12 @@ var GameView = function () {
         _util2.default.POKEMON_IDS.forEach(function (pokemonId) {
           var pokemonListItem = document.createElement("li");
           var pokemonImage = document.createElement("img");
+          var pokemonUrl = 'assets/img/pokemon-' + pokemonId + '.png';
+          pokemonImage.src = pokemonUrl;
 
-          pokemonImage.src = 'assets/img/pokemon-' + pokemonId + '.png';
+          _this3.staticAssets.addLoadedImage(pokemonUrl, pokemonImage);
           pokemonImage.className = "select-pokemon-img";
-          pokemonImage.setAttribute("value", pokemonId);
+          pokemonImage.data = pokemonId;
           pokemonListItem.appendChild(pokemonImage);
           _this3.bindPokemonSelectClickListener(pokemonImage);
 
@@ -445,7 +515,7 @@ var GameView = function () {
   }, {
     key: 'getCurrentPlayerOffset',
     value: function getCurrentPlayerOffset(data) {
-      return [_game.CANVAS_X / 2 - data[this.currentPlayerId].pos[0], _game.CANVAS_Y / 2 - data[this.currentPlayerId].pos[1]];
+      return [_game2.default.CANVAS_X / 2 - data[this.currentPlayerId].pos[0], _game2.default.CANVAS_Y / 2 - data[this.currentPlayerId].pos[1]];
     }
   }, {
     key: 'powerCurrentPlayer',
@@ -505,81 +575,230 @@ exports.default = GameView;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var drawPlayer = exports.drawPlayer = function drawPlayer(context, offset, data) {
-  drawPlayerName(context, offset, data);
 
-  var img = new Image();
-  img.onload = function () {
-    drawPlayerImage(context, offset, data, img);
-  };
-  img.src = data.img;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-  drawPlayerOutline(context, offset, data);
-  drawPlayerImage(context, offset, data, img);
-};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var drawPlayerName = function drawPlayerName(context, offset, data) {
-  context.fillStyle = PLAYER_INFO_COLOR;
-  context.font = "bold 14px Arial";
-  context.fillText(data.name, data.pos[0] + offset[0] + data.radius + 3, data.pos[1] + offset[1]);
-};
+var Player = function () {
+  function Player(context, data, staticAssets) {
+    var currentPlayer = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
-var drawPlayerImage = function drawPlayerImage(context, offset, data, img) {
-  context.drawImage(img, data.pos[0] + offset[0] - data.radius, data.pos[1] + offset[1] - data.radius, data.radius * 2, data.radius * 2);
-};
+    _classCallCheck(this, Player);
 
-var drawPlayerOutline = function drawPlayerOutline(context, offset, data) {
-  if (data.direHit) drawPlayerDireHit(context, offset, data);
+    this.context = context;
+    this.staticAssets = staticAssets;
+    this.currentPlayer = currentPlayer;
 
-  context.beginPath();
-  context.arc(data.pos[0] + offset[0], data.pos[1] + offset[1], data.radius, 0, 2 * Math.PI);
-
-  context.lineWidth = NORMAL_OUTLINE_WIDTH;
-  context.strokeStyle = PLAYER_INFO_COLOR;
-  context.stroke();
-
-  if (data.activatingDireHit || data.direHit) {
-    drawDireHitOutline(context, offset, data);
+    this.imgLoaded = false;
+    this.fetchImage(data.img);
   }
-};
 
-var drawDireHitOutline = function drawDireHitOutline(context, offset, data) {
-  context.beginPath();
-  context.arc(data.pos[0] + offset[0], data.pos[1] + offset[1], data.radius + NORMAL_OUTLINE_WIDTH * 0.75, 0, 2 * Math.PI);
+  _createClass(Player, [{
+    key: "fetchImage",
+    value: function fetchImage(url) {
+      if (this.currentPlayer && url === "assets/img/egg.png") {
+        url = "assets/img/current_player_egg.png";
+      }
 
-  context.lineWidth = NORMAL_OUTLINE_WIDTH * 0.75;
-  context.strokeStyle = DIRE_HIT_COLOR;
-  context.stroke();
-};
+      if (this.staticAssets.images[url]) {
+        this.img = this.staticAssets.images[url];
+        this.imgLoaded = true;
+      } else {
+        this.loadImage(url);
+      }
+    }
+  }, {
+    key: "loadImage",
+    value: function loadImage(url) {
+      var _this = this;
 
-var drawPlayerDireHit = function drawPlayerDireHit(context, offset, data) {
-  context.beginPath();
-  context.fillStyle = SPIKES_COLOR;
-  context.fillRect(data.pos[0] + offset[0] - data.radius - DIRE_HIT_OUTLINE_WIDTH / 2 + 2, data.pos[1] + offset[1] - data.radius - DIRE_HIT_OUTLINE_WIDTH / 2 + 2, data.radius * 2 + DIRE_HIT_OUTLINE_WIDTH - 4, data.radius * 2 + DIRE_HIT_OUTLINE_WIDTH - 4);
+      this.img = new Image();
 
-  drawRotatedSquare(context, offset, data);
-};
+      this.img.onload = function () {
+        _this.imgLoaded = true;
+        _this.staticAssets.addLoadedImage(url, _this.img);
+      };
 
-var drawRotatedSquare = function drawRotatedSquare(context, offset, data) {
-  context.save();
+      this.img.src = url;
+    }
+  }, {
+    key: "resetImage",
+    value: function resetImage(url) {
+      this.imgLoaded = false;
+      this.fetchImage(url);
+    }
+  }, {
+    key: "checkNewImage",
+    value: function checkNewImage(url) {
+      if (!this.img.src.includes(url)) {
+        this.resetImage(url);
+      }
+    }
+  }, {
+    key: "draw",
+    value: function draw(offset, data) {
+      this.checkNewImage(data.img);
+      this.drawName(offset, data);
+      this.drawOutline(offset, data);
 
-  context.translate(data.pos[0] + offset[0], data.pos[1] + offset[1]);
+      if (this.imgLoaded) {
+        this.drawImage(offset, data);
+      }
+    }
+  }, {
+    key: "drawName",
+    value: function drawName(offset, data) {
+      this.context.fillStyle = Player.PLAYER_INFO_COLOR;
+      this.context.font = "bold 14px Arial";
 
-  context.rotate(Math.PI / 4);
-  context.fillStyle = SPIKES_COLOR;
-  context.fillRect(-(data.radius + DIRE_HIT_OUTLINE_WIDTH / 2) + 2, -(data.radius + DIRE_HIT_OUTLINE_WIDTH / 2) + 2, data.radius * 2 + DIRE_HIT_OUTLINE_WIDTH - 4, data.radius * 2 + DIRE_HIT_OUTLINE_WIDTH - 4);
+      this.context.fillText(data.name, data.pos[0] + offset[0] + data.radius + 3, data.pos[1] + offset[1]);
+    }
+  }, {
+    key: "drawImage",
+    value: function drawImage(offset, data) {
+      this.context.drawImage(this.img, data.pos[0] + offset[0] - data.radius, data.pos[1] + offset[1] - data.radius, data.radius * 2, data.radius * 2);
+    }
+  }, {
+    key: "drawOutline",
+    value: function drawOutline(offset, data) {
+      if (data.direHit) this.drawDireHit(offset, data);
 
-  context.restore();
-};
+      this.context.beginPath();
+      this.context.arc(data.pos[0] + offset[0], data.pos[1] + offset[1], data.radius, 0, 2 * Math.PI);
 
-var PLAYER_INFO_COLOR = "#000";
-var DIRE_HIT_COLOR = "#ff3d00";
-var SPIKES_COLOR = "#fffc00";
-var NORMAL_OUTLINE_WIDTH = 5;
-var DIRE_HIT_OUTLINE_WIDTH = 10;
+      this.context.lineWidth = Player.NORMAL_OUTLINE_WIDTH;
+      this.context.strokeStyle = Player.PLAYER_INFO_COLOR;
+      this.context.stroke();
+
+      if (data.activatingDireHit || data.direHit) {
+        this.drawDireHitOutline(offset, data);
+      }
+    }
+  }, {
+    key: "drawDireHitOutline",
+    value: function drawDireHitOutline(offset, data) {
+      this.context.beginPath();
+      this.context.arc(data.pos[0] + offset[0], data.pos[1] + offset[1], data.radius + Player.NORMAL_OUTLINE_WIDTH * 0.75, 0, 2 * Math.PI);
+
+      this.context.lineWidth = Player.NORMAL_OUTLINE_WIDTH * 0.75;
+      this.context.strokeStyle = Player.DIRE_HIT_COLOR;
+      this.context.stroke();
+    }
+  }, {
+    key: "drawDireHit",
+    value: function drawDireHit(offset, data) {
+      this.context.beginPath();
+      this.context.fillStyle = Player.SPIKES_COLOR;
+      this.context.fillRect(data.pos[0] + offset[0] - data.radius - Player.DIRE_HIT_OUTLINE_WIDTH / 2 + 2, data.pos[1] + offset[1] - data.radius - Player.DIRE_HIT_OUTLINE_WIDTH / 2 + 2, data.radius * 2 + Player.DIRE_HIT_OUTLINE_WIDTH - 4, data.radius * 2 + Player.DIRE_HIT_OUTLINE_WIDTH - 4);
+
+      this.drawRotatedSquare(offset, data);
+    }
+  }, {
+    key: "drawRotatedSquare",
+    value: function drawRotatedSquare(offset, data) {
+      this.context.save();
+
+      this.context.translate(data.pos[0] + offset[0], data.pos[1] + offset[1]);
+
+      this.context.rotate(Math.PI / 4);
+      this.context.fillStyle = Player.SPIKES_COLOR;
+      this.context.fillRect(-(data.radius + Player.DIRE_HIT_OUTLINE_WIDTH / 2) + 2, -(data.radius + Player.DIRE_HIT_OUTLINE_WIDTH / 2) + 2, data.radius * 2 + Player.DIRE_HIT_OUTLINE_WIDTH - 4, data.radius * 2 + Player.DIRE_HIT_OUTLINE_WIDTH - 4);
+
+      this.context.restore();
+    }
+  }]);
+
+  return Player;
+}();
+
+Player.PLAYER_INFO_COLOR = "#000";
+Player.DIRE_HIT_COLOR = "#ff3d00";
+Player.SPIKES_COLOR = "#fffc00";
+Player.NORMAL_OUTLINE_WIDTH = 5;
+Player.DIRE_HIT_OUTLINE_WIDTH = 10;
+
+exports.default = Player;
 
 /***/ }),
 /* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _util = __webpack_require__(4);
+
+var _util2 = _interopRequireDefault(_util);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var StaticAssets = function () {
+  function StaticAssets(notifyCallback) {
+    _classCallCheck(this, StaticAssets);
+
+    this.loadedCount = 0;
+    this.images = {};
+    this.notifyCallback = notifyCallback;
+
+    this.loadImages();
+  }
+
+  _createClass(StaticAssets, [{
+    key: "addImage",
+    value: function addImage(url) {
+      var _this = this;
+
+      this.images[url] = new Image();
+
+      this.images[url].onload = function () {
+        _this.loadedCount++;
+
+        if (_this.checkAllLoaded()) {
+          _this.notifyCallback();
+        }
+      };
+
+      this.images[url].src = url;
+    }
+  }, {
+    key: "addLoadedImage",
+    value: function addLoadedImage(url, loadedImage) {
+      this.images[url] = loadedImage;
+    }
+  }, {
+    key: "loadImages",
+    value: function loadImages() {
+      var _this2 = this;
+
+      StaticAssets.IMAGE_URLS.forEach(function (imageUrl) {
+        _this2.addImage(imageUrl);
+      });
+    }
+  }, {
+    key: "checkAllLoaded",
+    value: function checkAllLoaded() {
+      return this.loadedCount === Object.keys(this.images).length;
+    }
+  }]);
+
+  return StaticAssets;
+}();
+
+StaticAssets.IMAGE_URLS = ["assets/img/egg.png", "assets/img/current_player_egg.png", "assets/img/grass.png"];
+
+exports.default = StaticAssets;
+
+/***/ }),
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -628,24 +847,26 @@ var POKEMON_CHARACTER_NAMES = ["Misty", "Lass", "Beauty", "Serena", "Bonnie", "I
 module.exports = Util;
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _game = __webpack_require__(0);
-
 var _game_view = __webpack_require__(1);
 
 var _game_view2 = _interopRequireDefault(_game_view);
+
+var _game = __webpack_require__(0);
+
+var _game2 = _interopRequireDefault(_game);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 document.addEventListener("DOMContentLoaded", function () {
   var canvas = document.getElementById("game-canvas");
-  canvas.width = _game.CANVAS_X;
-  canvas.height = _game.CANVAS_Y;
+  canvas.width = _game2.default.CANVAS_X;
+  canvas.height = _game2.default.CANVAS_Y;
 
   var context = canvas.getContext("2d");
   var socket = io();

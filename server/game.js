@@ -4,31 +4,25 @@ const Util = require('./util');
 
 class Game {
   constructor() {
-    this.humanPlayers = [];
-    this.computerPlayers = [];
+    this.humanPlayers = {};
+    this.computerPlayers = {};
 
     this.addComputerPlayers(40);
   }
 
   findHumanPlayer(id) {
-    for (let i = 0; i < this.humanPlayers.length; i++) {
-      if (this.humanPlayers[i].id === id) {
-        return this.humanPlayers[i];
-      }
-    }
-
-    return false;
+    return this.humanPlayers[id];
   }
 
   isEmpty() {
-    return this.humanPlayers.length <= 0;
+    return Object.keys(this.humanPlayers).length <= 0;
   }
 
   addPlayer(player) {
     if (player instanceof HumanPlayer) {
-      this.humanPlayers.push(player);
+      this.humanPlayers[player.id] = player;
     } else if (player instanceof ComputerPlayer) {
-      this.computerPlayers.push(player);
+      this.computerPlayers[player.id] = player;
     } else {
       throw "unknown type of player :(";
     }
@@ -66,15 +60,11 @@ class Game {
   }
 
   allPlayers() {
-    return [].concat(this.humanPlayers, this.computerPlayers);
-  }
-
-  humanPlayersInclude(player) {
-    return this.humanPlayers.includes(player);
+    return Object.assign({}, this.computerPlayers, this.humanPlayers);
   }
 
   refillIfNeeded(n) {
-    if (this.humanPlayers.length + this.computerPlayers.length < n) {
+    if (Object.keys(this.allPlayers()).length < n) {
       this.addComputerPlayers(n);
     }
   }
@@ -93,7 +83,9 @@ class Game {
   removeInactivePlayers(currentTime) {
     const inactivityData = [];
 
-    this.humanPlayers.forEach(humanPlayer => {
+    Object.keys(this.humanPlayers).forEach(humanPlayerId => {
+      const humanPlayer = this.humanPlayers[humanPlayerId];
+
       if (currentTime - humanPlayer.lastActivityTime > INACTIVE_THRESHOLD) {
         inactivityData.push(humanPlayer.id);
         this.removePlayer(humanPlayer);
@@ -105,8 +97,11 @@ class Game {
 
   parsePlayerData() {
     const data = {};
+    const allPlayers = this.allPlayers();
 
-    this.allPlayers().forEach(player => {
+    Object.keys(allPlayers).forEach(playerId => {
+      const player = allPlayers[playerId];
+
       data[player.id] = {
         pos: player.pos,
         radius: player.radius,
@@ -121,7 +116,11 @@ class Game {
   }
 
   moveObjects(timeDelta) {
-    this.allPlayers().forEach(player => {
+    const allPlayers = this.allPlayers();
+
+    Object.keys(allPlayers).forEach(playerId => {
+      const player = allPlayers[playerId];
+
       if (player instanceof HumanPlayer) {
         player.velocity[0] *= 0.9;
         player.velocity[1] *= 0.9;
@@ -133,11 +132,12 @@ class Game {
 
   checkCollisions() {
     const allPlayers = this.allPlayers();
+    const allPlayerIds = Object.keys(allPlayers);
 
-    for (let i = 0; i < allPlayers.length; i++) {
-      for (let j = i + 1; j < allPlayers.length; j++) {
-        const player1 = allPlayers[i];
-        const player2 = allPlayers[j];
+    for (let i = 0; i < allPlayerIds.length; i++) {
+      for (let j = i + 1; j < allPlayerIds.length; j++) {
+        const player1 = allPlayers[allPlayerIds[i]];
+        const player2 = allPlayers[allPlayerIds[j]];
 
         const proximity = player1.proximityTo(player2);
         if (proximity === "collision") {
@@ -173,8 +173,10 @@ class Game {
   }
 
   checkForOverlap(allPlayers, pos) {
-    for (let i = 0; i < allPlayers.length; i++) {
-      const otherPlayer = allPlayers[i];
+    const allPlayerIds = Object.keys(allPlayers);
+
+    for (let i = 0; i < allPlayerIds.length; i++) {
+      const otherPlayer = allPlayers[allPlayerIds[i]];
 
       if (otherPlayer.isOverlappingWith(pos)) {
         return true;
@@ -192,9 +194,9 @@ class Game {
 
   removePlayer(player) {
     if (player instanceof HumanPlayer) {
-      this.humanPlayers.splice(this.humanPlayers.indexOf(player), 1);
+      delete this.humanPlayers[player.id];
     } else if (player instanceof ComputerPlayer) {
-      this.computerPlayers.splice(this.computerPlayers.indexOf(player), 1);
+      delete this.computerPlayers[player.id];
     } else {
       throw "unknown type of player :(";
     }
