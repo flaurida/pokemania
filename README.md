@@ -138,4 +138,5 @@ addImage(url) {
 ### Future Directions
 
 * Improve compatibility with Safari and IE
+* Garbage collection on client side when players lose
 * Multiple servers if the game gets too full
