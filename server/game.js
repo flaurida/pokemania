@@ -23,8 +23,6 @@ class Game {
       this.humanPlayers[player.id] = player;
     } else if (player instanceof ComputerPlayer) {
       this.computerPlayers[player.id] = player;
-    } else {
-      throw "unknown type of player :(";
     }
   }
 
@@ -197,9 +195,7 @@ class Game {
       delete this.humanPlayers[player.id];
     } else if (player instanceof ComputerPlayer) {
       delete this.computerPlayers[player.id];
-    } else {
-      throw "unknown type of player :(";
-    }
+    } 
   }
 }
 
