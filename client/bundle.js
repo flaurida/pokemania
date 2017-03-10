@@ -79,7 +79,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _player = __webpack_require__(2);
+var _player = __webpack_require__(3);
 
 var _player2 = _interopRequireDefault(_player);
 
@@ -217,13 +217,62 @@ exports.default = Game;
 "use strict";
 
 
+var POKEMON_IDS = [1, 4, 7, 24, 29, 34, 92, 112, 147, 152, 155, 158, 220, 304, 371];
+
+var Util = {
+  dist: function dist(pos1, pos2) {
+    return Math.sqrt(Math.pow(pos1[0] - pos2[0], 2) + Math.pow(pos1[1] - pos2[1], 2));
+  },
+  randomRadius: function randomRadius() {
+    return Math.floor(Math.random() * (20 - 5)) + 5;
+  },
+  randomVelocity: function randomVelocity() {
+    return [this.randomVelocityPiece(), this.randomVelocityPiece()];
+  },
+  randomVelocityPiece: function randomVelocityPiece() {
+    return Math.floor(Math.random() * (1.2 + 1.2)) - 1.2;
+  },
+  randomPokemonId: function randomPokemonId() {
+    return POKEMON_IDS[Math.floor(Math.random() * POKEMON_IDS.length)];
+  },
+  randomPlayerName: function randomPlayerName() {
+    return POKEMON_CHARACTER_NAMES[Math.floor(Math.random() * POKEMON_CHARACTER_NAMES.length)];
+  },
+  randomId: function randomId() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for (var i = 0; i < 5; i++) {
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+
+    return text;
+  },
+
+
+  DEFAULT_RADIUS: 15,
+
+  POKEMON_IDS: POKEMON_IDS
+};
+
+var POKEMON_CHARACTER_NAMES = ["Misty", "Lass", "Beauty", "Serena", "Bonnie", "Iris", "Jessie", "Lillie", "May", "Dawn", "Moon", "Mallow", "Sakura", "Shauna", "Candela", "Officer Jenny", "Aria", "Olivia", "Lusamine", "Lana", "Professor Ivy", "Mom", "Sabrina", "Viola", "Daisy", "Bianca", "Sumomo", "Blanche", "Agatha", "Georgia", "Grace", "Malva", "Karen"];
+
+module.exports = Util;
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _util = __webpack_require__(4);
+var _util = __webpack_require__(1);
 
 var _util2 = _interopRequireDefault(_util);
 
@@ -231,7 +280,7 @@ var _game = __webpack_require__(0);
 
 var _game2 = _interopRequireDefault(_game);
 
-var _static_assets = __webpack_require__(3);
+var _static_assets = __webpack_require__(4);
 
 var _static_assets2 = _interopRequireDefault(_static_assets);
 
@@ -575,7 +624,7 @@ GameView.KEYS = {
 exports.default = GameView;
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -730,7 +779,7 @@ Player.DIRE_HIT_OUTLINE_WIDTH = 10;
 exports.default = Player;
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -742,7 +791,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _util = __webpack_require__(4);
+var _util = __webpack_require__(1);
 
 var _util2 = _interopRequireDefault(_util);
 
@@ -809,62 +858,13 @@ StaticAssets.IMAGE_URLS = _util2.default.POKEMON_IDS.map(function (pokemonId) {
 exports.default = StaticAssets;
 
 /***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var POKEMON_IDS = [1, 4, 7, 24, 29, 34, 92, 112, 147, 152, 155, 158, 220, 304, 371];
-
-var Util = {
-  dist: function dist(pos1, pos2) {
-    return Math.sqrt(Math.pow(pos1[0] - pos2[0], 2) + Math.pow(pos1[1] - pos2[1], 2));
-  },
-  randomRadius: function randomRadius() {
-    return Math.floor(Math.random() * (20 - 5)) + 5;
-  },
-  randomVelocity: function randomVelocity() {
-    return [this.randomVelocityPiece(), this.randomVelocityPiece()];
-  },
-  randomVelocityPiece: function randomVelocityPiece() {
-    return Math.floor(Math.random() * (1.2 + 1.2)) - 1.2;
-  },
-  randomPokemonId: function randomPokemonId() {
-    return POKEMON_IDS[Math.floor(Math.random() * POKEMON_IDS.length)];
-  },
-  randomPlayerName: function randomPlayerName() {
-    return POKEMON_CHARACTER_NAMES[Math.floor(Math.random() * POKEMON_CHARACTER_NAMES.length)];
-  },
-  randomId: function randomId() {
-    var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-    for (var i = 0; i < 5; i++) {
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-
-    return text;
-  },
-
-
-  DEFAULT_RADIUS: 15,
-
-  POKEMON_IDS: POKEMON_IDS
-};
-
-var POKEMON_CHARACTER_NAMES = ["Misty", "Lass", "Beauty", "Serena", "Bonnie", "Iris", "Jessie", "Lillie", "May", "Dawn", "Moon", "Mallow", "Sakura", "Shauna", "Candela", "Officer Jenny", "Aria", "Olivia", "Lusamine", "Lana", "Professor Ivy", "Mom", "Sabrina", "Viola", "Daisy", "Bianca", "Sumomo", "Blanche", "Agatha", "Georgia", "Grace", "Malva", "Karen"];
-
-module.exports = Util;
-
-/***/ }),
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _game_view = __webpack_require__(1);
+var _game_view = __webpack_require__(2);
 
 var _game_view2 = _interopRequireDefault(_game_view);
 
@@ -878,7 +878,6 @@ document.addEventListener("DOMContentLoaded", function () {
   var canvas = document.getElementById("game-canvas");
   canvas.width = _game2.default.CANVAS_X;
   canvas.height = _game2.default.CANVAS_Y;
-
   var context = canvas.getContext("2d");
   var socket = io();
 
