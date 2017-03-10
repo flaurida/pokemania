@@ -89,11 +89,12 @@ class Sockets {
     if (player && !player.activatingDireHit) {
       player.activateDireHit();
       this.socket.emit("activate dire hit",
-        { id: player.id, lag: player.direHitDelay() });
+        { id: player.id, lag: player.direHitDelay() }
+      );
     }
   }
 }
 
-const REDRAW_RATE = 1000 / 30;
+const REDRAW_RATE = 1000 / 20;
 
 module.exports = Sockets;
