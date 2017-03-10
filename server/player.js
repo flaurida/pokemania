@@ -57,7 +57,7 @@ class Player {
     this.evolve();
 
     const velocityScale = timeDelta / NORMAL_FRAME_TIME_DELTA,
-      sizeScale = (Util.DEFAULT_RADIUS / this.radius - 1) / 3,
+      sizeScale = (Util.DEFAULT_RADIUS / this.radius - 1) / SPEED_SCALE_FACTOR,
       deltaX = this.velocity[0] * velocityScale * (1 + sizeScale),
       deltaY = this.velocity[1] * velocityScale * (1 + sizeScale),
       oldPos = this.pos;
@@ -136,5 +136,6 @@ const NORMAL_FRAME_TIME_DELTA = 1000 / 60;
 const DIRE_HIT_DURATION = 500;
 const DIRE_HIT_DELAY = 500;
 const NEARNESS_THRESHOLD = 50;
+const SPEED_SCALE_FACTOR = 3.5;
 
 module.exports = Player;
