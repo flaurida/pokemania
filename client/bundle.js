@@ -641,9 +641,7 @@ var Player = function () {
       this.drawName(offset, data);
       this.drawOutline(offset, data);
 
-      if (this.imgLoaded) {
-        this.drawImage(offset, data);
-      }
+      this.drawImage(offset, data);
     }
   }, {
     key: "drawName",
@@ -656,7 +654,9 @@ var Player = function () {
   }, {
     key: "drawImage",
     value: function drawImage(offset, data) {
-      this.context.drawImage(this.img, data.pos[0] + offset[0] - data.radius, data.pos[1] + offset[1] - data.radius, data.radius * 2, data.radius * 2);
+      var img = this.imgLoaded ? this.img : this.staticAssets.images["assets/img/evolve.png"];
+
+      this.context.drawImage(img, data.pos[0] + offset[0] - data.radius, data.pos[1] + offset[1] - data.radius, data.radius * 2, data.radius * 2);
     }
   }, {
     key: "drawOutline",
@@ -792,7 +792,7 @@ var StaticAssets = function () {
   return StaticAssets;
 }();
 
-StaticAssets.IMAGE_URLS = ["assets/img/egg.png", "assets/img/current_player_egg.png", "assets/img/grass.png"];
+StaticAssets.IMAGE_URLS = ["assets/img/egg.png", "assets/img/current_player_egg.png", "assets/img/grass.png", "assets/img/evolve.png"];
 
 exports.default = StaticAssets;
 

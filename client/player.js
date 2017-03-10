@@ -48,9 +48,7 @@ class Player {
     this.drawName(offset, data);
     this.drawOutline(offset, data);
 
-    if (this.imgLoaded) {
-      this.drawImage(offset, data);
-    }
+    this.drawImage(offset, data);
   }
 
   drawName(offset, data) {
@@ -65,8 +63,11 @@ class Player {
   }
 
   drawImage(offset, data) {
+    const img = this.imgLoaded ?
+      this.img : this.staticAssets.images["assets/img/evolve.png"];
+
     this.context.drawImage(
-      this.img,
+      img,
       data.pos[0] + offset[0] - data.radius,
       data.pos[1] + offset[1] - data.radius,
       data.radius * 2,
