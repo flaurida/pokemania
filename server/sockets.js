@@ -85,7 +85,6 @@ class Sockets {
   }
 
   onDireHitPlayer(data) {
-    if (!this
     const player = this.game.findHumanPlayer(data.id);
     if (player && !player.activatingDireHit) {
       player.activateDireHit();
