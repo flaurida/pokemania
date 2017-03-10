@@ -38,11 +38,13 @@ class StaticAssets {
   }
 }
 
-StaticAssets.IMAGE_URLS = [
+StaticAssets.IMAGE_URLS = Util.POKEMON_IDS.map(pokemonId => (
+  `assets/img/pokemon-${pokemonId}.png`
+)).concat([
   "assets/img/egg.png",
   "assets/img/current_player_egg.png",
   "assets/img/grass.png",
   "assets/img/evolve.png"
-];
+]);
 
 export default StaticAssets;

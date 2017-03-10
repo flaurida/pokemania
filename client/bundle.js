@@ -367,7 +367,7 @@ var GameView = function () {
       selectPokemonButton.onclick = function () {
         _this2.name = document.getElementById("name-input").value;
         if (_this2.name.length > 25) _this2.name = "";
-        _this2.addPokemonToSelectList();
+        _this2.populateSelectList();
         _this2.activateScreen("selectPokemon");
       };
 
@@ -382,22 +382,32 @@ var GameView = function () {
       };
     }
   }, {
+    key: 'populateSelectList',
+    value: function populateSelectList() {
+      var pokemonList = document.getElementById("pokemon-list");
+
+      if (this.imgLoaded) {
+        this.addPokemonToSelectList(pokemonList);
+      } else {
+        setTimeout(this.populateSelectList.bind(this), 100);
+      }
+    }
+  }, {
     key: 'addPokemonToSelectList',
-    value: function addPokemonToSelectList() {
+    value: function addPokemonToSelectList(pokemonList) {
       var _this3 = this;
 
-      var pokemonList = document.getElementById("pokemon-list");
+      var selectListLoading = document.getElementById("select-loading");
+      selectListLoading.className = "hidden";
 
       if (!pokemonList.firstChild) {
         _util2.default.POKEMON_IDS.forEach(function (pokemonId) {
           var pokemonListItem = document.createElement("li");
-          var pokemonImage = document.createElement("img");
           var pokemonUrl = 'assets/img/pokemon-' + pokemonId + '.png';
-          pokemonImage.src = pokemonUrl;
-
-          _this3.staticAssets.addLoadedImage(pokemonUrl, pokemonImage);
+          var pokemonImage = _this3.staticAssets.images[pokemonUrl];
           pokemonImage.className = "select-pokemon-img";
           pokemonImage.data = pokemonId;
+
           pokemonListItem.appendChild(pokemonImage);
           _this3.bindPokemonSelectClickListener(pokemonImage);
 
@@ -792,7 +802,9 @@ var StaticAssets = function () {
   return StaticAssets;
 }();
 
-StaticAssets.IMAGE_URLS = ["assets/img/egg.png", "assets/img/current_player_egg.png", "assets/img/grass.png", "assets/img/evolve.png"];
+StaticAssets.IMAGE_URLS = _util2.default.POKEMON_IDS.map(function (pokemonId) {
+  return "assets/img/pokemon-" + pokemonId + ".png";
+}).concat(["assets/img/egg.png", "assets/img/current_player_egg.png", "assets/img/grass.png", "assets/img/evolve.png"]);
 
 exports.default = StaticAssets;
 

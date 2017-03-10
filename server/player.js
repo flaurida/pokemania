@@ -57,7 +57,7 @@ class Player {
     this.evolve();
 
     const velocityScale = timeDelta / NORMAL_FRAME_TIME_DELTA,
-      sizeScale = (Util.DEFAULT_RADIUS / this.radius - 1) / 4,
+      sizeScale = (Util.DEFAULT_RADIUS / this.radius - 1) / 3,
       deltaX = this.velocity[0] * velocityScale * (1 + sizeScale),
       deltaY = this.velocity[1] * velocityScale * (1 + sizeScale),
       oldPos = this.pos;

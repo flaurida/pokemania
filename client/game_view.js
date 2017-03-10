@@ -114,7 +114,7 @@ class GameView {
     selectPokemonButton.onclick = () => {
       this.name = document.getElementById("name-input").value;
       if (this.name.length > 25) this.name = "";
-      this.addPokemonToSelectList();
+      this.populateSelectList();
       this.activateScreen("selectPokemon");
     };
 
@@ -129,19 +129,28 @@ class GameView {
     };
   }
 
-  addPokemonToSelectList() {
+  populateSelectList() {
     const pokemonList = document.getElementById("pokemon-list");
+
+    if (this.imgLoaded) {
+      this.addPokemonToSelectList(pokemonList);
+    } else {
+      setTimeout(this.populateSelectList.bind(this), 100);
+    }
+  }
+
+  addPokemonToSelectList(pokemonList) {
+    const selectListLoading = document.getElementById("select-loading");
+    selectListLoading.className = "hidden";
 
     if (!pokemonList.firstChild) {
       Util.POKEMON_IDS.forEach(pokemonId => {
         const pokemonListItem = document.createElement("li");
-        const pokemonImage = document.createElement("img");
         const pokemonUrl = `assets/img/pokemon-${pokemonId}.png`;
-        pokemonImage.src = pokemonUrl;
-
-        this.staticAssets.addLoadedImage(pokemonUrl, pokemonImage);
+        const pokemonImage = this.staticAssets.images[pokemonUrl];
         pokemonImage.className = "select-pokemon-img";
         pokemonImage.data = pokemonId;
+
         pokemonListItem.appendChild(pokemonImage);
         this.bindPokemonSelectClickListener(pokemonImage);
 

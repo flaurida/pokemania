@@ -140,6 +140,11 @@ input[type="text"]:focus {
   border-radius: 5px;
 }
 
+#select-loading {
+  text-align: center;
+  margin-top: 10px;
+}
+
 .instructions-list {
   width: 90%;
   margin: 10px auto;
