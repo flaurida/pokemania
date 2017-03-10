@@ -539,7 +539,6 @@ var GameView = function () {
     key: 'handleInactivity',
     value: function handleInactivity(data) {
       if (data.id === this.currentPlayerId) {
-        this.currentPlayerId = null;
         this.playStatus === "restart";
         this.activateScreen("inactive");
       }
