@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   canvas.height = Game.CANVAS_Y;
 
   const context = canvas.getContext("2d");
-  const socket = io({transports: ['websocket']});
+  const socket = io();
 
   const gameView = new GameView(context, socket);
 });
