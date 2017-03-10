@@ -264,7 +264,7 @@ var GameView = function () {
       this.playStatus = "playing";
       this.initialData = false;
 
-      var pokemonId = this.selectedPokemonImage ? parseInt(this.selectedPokemonImage.getAttribute("data")) : null;
+      var pokemonId = this.selectedPokemonImage ? this.selectedPokemonImage.data : null;
 
       this.socket.emit("new player", {
         name: this.name,

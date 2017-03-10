@@ -24,7 +24,7 @@ class GameView {
     this.initialData = false;
 
     const pokemonId = this.selectedPokemonImage ?
-      parseInt(this.selectedPokemonImage.getAttribute("data")) : null;
+      this.selectedPokemonImage.data : null;
 
     this.socket.emit("new player", {
       name: this.name,
