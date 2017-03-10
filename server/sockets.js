@@ -52,8 +52,8 @@ class Sockets {
     const timeDelta = currentTime - this.lastTime;
     const data = this.game.step(timeDelta, currentTime);
 
-    this.socket.emit("draw game", data.playerData);
     this.notifyInactivePlayers(data.inactivityData);
+    this.socket.emit("draw game", data.playerData);
     this.lastTime = currentTime;
   }
 
@@ -85,7 +85,7 @@ class Sockets {
   }
 
   onDireHitPlayer(data) {
-    if (!this.game) return;
+    if (!this
     const player = this.game.findHumanPlayer(data.id);
     if (player && !player.activatingDireHit) {
       player.activateDireHit();

@@ -195,7 +195,7 @@ class Game {
       delete this.humanPlayers[player.id];
     } else if (player instanceof ComputerPlayer) {
       delete this.computerPlayers[player.id];
-    } 
+    }
   }
 }
 
