@@ -263,6 +263,8 @@ class GameView {
   }
 
   powerCurrentPlayer() {
+    if (this.playStatus !== "playing") return;
+
     const impulse = 0.5;
     const allImpulses = [];
 
@@ -278,7 +280,9 @@ class GameView {
   }
 
   activateDireHit() {
-    this.socket.emit("dire hit player", { id: this.currentPlayerId });
+    if (this.playStatus === "playing") {
+      this.socket.emit("dire hit player", { id: this.currentPlayerId });
+    }
   }
 
   handleInactivity(data) {
