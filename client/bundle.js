@@ -719,7 +719,6 @@ var Player = function () {
 
       this.img.onload = function () {
         _this.staticAssets.addLoadedImage(url, _this.img);
-
         setTimeout(function () {
           _this.imgLoaded = true;
         }, Player.EVOLUTION_DURATION);

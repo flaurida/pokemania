@@ -26,7 +26,6 @@ class Player {
 
     this.img.onload = () => {
       this.staticAssets.addLoadedImage(url, this.img);
-
       setTimeout(
         () => { this.imgLoaded = true; },
         Player.EVOLUTION_DURATION
