@@ -113,11 +113,19 @@ class GameView {
 
     selectPokemonButton.onclick = () => {
       this.name = document.getElementById("name-input").value;
-      if (this.name.length > 25) this.name = "";
+      
+      if (this.name === "" || this.name.length > 25) {
+        this.name = Util.randomPlayerName();
+      }
+
       this.populateSelectList();
       this.activateScreen("selectPokemon");
     };
 
+    this.bindSelectPokemonClickHandlers();
+  }
+
+  bindSelectPokemonClickHandlers() {
     const selectPokemon = document.getElementById("select-pokemon");
     selectPokemon.onclick = () => {
       this.activateScreen("selectPokemon");

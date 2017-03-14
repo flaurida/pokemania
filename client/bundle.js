@@ -415,14 +415,25 @@ var GameView = function () {
 
       selectPokemonButton.onclick = function () {
         _this2.name = document.getElementById("name-input").value;
-        if (_this2.name.length > 25) _this2.name = "";
+
+        if (_this2.name === "" || _this2.name.length > 25) {
+          _this2.name = _util2.default.randomPlayerName();
+        }
+
         _this2.populateSelectList();
         _this2.activateScreen("selectPokemon");
       };
 
+      this.bindSelectPokemonClickHandlers();
+    }
+  }, {
+    key: 'bindSelectPokemonClickHandlers',
+    value: function bindSelectPokemonClickHandlers() {
+      var _this3 = this;
+
       var selectPokemon = document.getElementById("select-pokemon");
       selectPokemon.onclick = function () {
-        _this2.activateScreen("selectPokemon");
+        _this3.activateScreen("selectPokemon");
       };
 
       var selectPokemonBody = document.getElementById("select-pokemon-body");
@@ -444,7 +455,7 @@ var GameView = function () {
   }, {
     key: 'addPokemonToSelectList',
     value: function addPokemonToSelectList(pokemonList) {
-      var _this3 = this;
+      var _this4 = this;
 
       var selectListLoading = document.getElementById("select-loading");
       selectListLoading.className = "hidden";
@@ -453,12 +464,12 @@ var GameView = function () {
         _util2.default.POKEMON_IDS.forEach(function (pokemonId) {
           var pokemonListItem = document.createElement("li");
           var pokemonUrl = 'assets/img/pokemon-' + pokemonId + '.png';
-          var pokemonImage = _this3.staticAssets.images[pokemonUrl];
+          var pokemonImage = _this4.staticAssets.images[pokemonUrl];
           pokemonImage.className = "select-pokemon-img";
           pokemonImage.data = pokemonId;
 
           pokemonListItem.appendChild(pokemonImage);
-          _this3.bindPokemonSelectClickListener(pokemonImage);
+          _this4.bindPokemonSelectClickListener(pokemonImage);
 
           pokemonList.appendChild(pokemonListItem);
         });
@@ -467,22 +478,22 @@ var GameView = function () {
   }, {
     key: 'bindPokemonSelectClickListener',
     value: function bindPokemonSelectClickListener(pokemonImage) {
-      var _this4 = this;
+      var _this5 = this;
 
       pokemonImage.onclick = function () {
         pokemonImage.classList.toggle("select-pokemon-img-focus");
 
-        if (_this4.selectedPokemonImage) {
-          _this4.selectedPokemonImage.classList.toggle("select-pokemon-img-focus");
+        if (_this5.selectedPokemonImage) {
+          _this5.selectedPokemonImage.classList.toggle("select-pokemon-img-focus");
         }
 
-        _this4.selectedPokemonImage = pokemonImage;
+        _this5.selectedPokemonImage = pokemonImage;
       };
     }
   }, {
     key: 'addRestartClickListener',
     value: function addRestartClickListener() {
-      var _this5 = this;
+      var _this6 = this;
 
       var restartButtons = document.getElementsByClassName("restart-button");
 
@@ -490,7 +501,7 @@ var GameView = function () {
         var restartButton = restartButtons[i];
 
         restartButton.onclick = function () {
-          _this5.start();
+          _this6.start();
         };
       }
     }
@@ -524,16 +535,16 @@ var GameView = function () {
   }, {
     key: 'addInstructionsClickListener',
     value: function addInstructionsClickListener() {
-      var _this6 = this;
+      var _this7 = this;
 
       var instructionsButton = document.getElementById("instructions-button");
       instructionsButton.onclick = function () {
-        _this6.activateScreen("instructions");
+        _this7.activateScreen("instructions");
       };
 
       var instructions = document.getElementById("instructions");
       instructions.onclick = function () {
-        _this6.activateScreen("instructions");
+        _this7.activateScreen("instructions");
       };
 
       var instructionsBody = document.getElementById("instructions-body");
@@ -544,7 +555,7 @@ var GameView = function () {
   }, {
     key: 'bindKeyHandlers',
     value: function bindKeyHandlers() {
-      var _this7 = this;
+      var _this8 = this;
 
       Object.keys(GameView.MOVES).forEach(function (key) {
         var move = GameView.MOVES[key];
@@ -567,7 +578,7 @@ var GameView = function () {
       document.addEventListener('keydown', function (e) {
         if (e.key === " ") {
           e.preventDefault();
-          _this7.activateDireHit();
+          _this8.activateDireHit();
         }
       });
     }
@@ -579,6 +590,8 @@ var GameView = function () {
   }, {
     key: 'powerCurrentPlayer',
     value: function powerCurrentPlayer() {
+      if (this.playStatus !== "playing") return;
+
       var impulse = 0.5;
       var allImpulses = [];
 
@@ -592,13 +605,15 @@ var GameView = function () {
   }, {
     key: 'activateDireHit',
     value: function activateDireHit() {
-      this.socket.emit("dire hit player", { id: this.currentPlayerId });
+      if (this.playStatus === "playing") {
+        this.socket.emit("dire hit player", { id: this.currentPlayerId });
+      }
     }
   }, {
     key: 'handleInactivity',
     value: function handleInactivity(data) {
       if (data.id === this.currentPlayerId) {
-        this.playStatus === "restart";
+        this.playStatus = "restart";
         this.activateScreen("inactive");
       }
     }
