@@ -38,11 +38,11 @@ class GameView {
   }
 
   setEventHandlers() {
-    this.addStartClickListener();
-    this.addSelectPokemonClickListener();
-    this.addInstructionsClickListener();
-    this.addRestartClickListener();
+    this.addAllClickListeners();
+    this.setSocketEvents();
+  }
 
+  setSocketEvents() {
     this.socket.on("draw game", this.drawGame.bind(this));
     this.socket.on("activate dire hit", this.startCountdown.bind(this));
     this.socket.on("inactive player", this.handleInactivity.bind(this));
@@ -113,7 +113,7 @@ class GameView {
 
     selectPokemonButton.onclick = () => {
       this.name = document.getElementById("name-input").value;
-      
+
       if (this.name === "" || this.name.length > 25) {
         this.name = Util.randomPlayerName();
       }
@@ -179,6 +179,14 @@ class GameView {
     };
   }
 
+  addAllClickListeners() {
+    this.addStartClickListener();
+    this.addSelectPokemonClickListener();
+    this.addInstructionsClickListener();
+    this.addRestartClickListener();
+    this.addMainMenuClickListener();
+  }
+
   addRestartClickListener() {
     const restartButtons = document.getElementsByClassName("restart-button");
 
@@ -187,6 +195,18 @@ class GameView {
 
       restartButton.onclick = () => {
         this.start();
+      };
+    }
+  }
+
+  addMainMenuClickListener() {
+    const mainMenuButtons = document.getElementsByClassName("main-menu-button");
+
+    for (let i = 0; i < mainMenuButtons.length; i++) {
+      let mainMenuButton = mainMenuButtons[i];
+
+      mainMenuButton.onclick = () => {
+        this.activateScreen("start");
       };
     }
   }
@@ -305,7 +325,11 @@ GameView.MOVES = {
   "ArrowLeft": "left",
   "ArrowUp": "up",
   "ArrowRight": "right",
-  "ArrowDown": "down"
+  "ArrowDown": "down",
+  "a": "left",
+  "w": "up",
+  "d": "right",
+  "s": "down"
 };
 
 GameView.KEYS = {

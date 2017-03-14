@@ -329,11 +329,12 @@ var GameView = function () {
   }, {
     key: 'setEventHandlers',
     value: function setEventHandlers() {
-      this.addStartClickListener();
-      this.addSelectPokemonClickListener();
-      this.addInstructionsClickListener();
-      this.addRestartClickListener();
-
+      this.addAllClickListeners();
+      this.setSocketEvents();
+    }
+  }, {
+    key: 'setSocketEvents',
+    value: function setSocketEvents() {
       this.socket.on("draw game", this.drawGame.bind(this));
       this.socket.on("activate dire hit", this.startCountdown.bind(this));
       this.socket.on("inactive player", this.handleInactivity.bind(this));
@@ -491,6 +492,15 @@ var GameView = function () {
       };
     }
   }, {
+    key: 'addAllClickListeners',
+    value: function addAllClickListeners() {
+      this.addStartClickListener();
+      this.addSelectPokemonClickListener();
+      this.addInstructionsClickListener();
+      this.addRestartClickListener();
+      this.addMainMenuClickListener();
+    }
+  }, {
     key: 'addRestartClickListener',
     value: function addRestartClickListener() {
       var _this6 = this;
@@ -502,6 +512,21 @@ var GameView = function () {
 
         restartButton.onclick = function () {
           _this6.start();
+        };
+      }
+    }
+  }, {
+    key: 'addMainMenuClickListener',
+    value: function addMainMenuClickListener() {
+      var _this7 = this;
+
+      var mainMenuButtons = document.getElementsByClassName("main-menu-button");
+
+      for (var i = 0; i < mainMenuButtons.length; i++) {
+        var mainMenuButton = mainMenuButtons[i];
+
+        mainMenuButton.onclick = function () {
+          _this7.activateScreen("start");
         };
       }
     }
@@ -535,16 +560,16 @@ var GameView = function () {
   }, {
     key: 'addInstructionsClickListener',
     value: function addInstructionsClickListener() {
-      var _this7 = this;
+      var _this8 = this;
 
       var instructionsButton = document.getElementById("instructions-button");
       instructionsButton.onclick = function () {
-        _this7.activateScreen("instructions");
+        _this8.activateScreen("instructions");
       };
 
       var instructions = document.getElementById("instructions");
       instructions.onclick = function () {
-        _this7.activateScreen("instructions");
+        _this8.activateScreen("instructions");
       };
 
       var instructionsBody = document.getElementById("instructions-body");
@@ -555,7 +580,7 @@ var GameView = function () {
   }, {
     key: 'bindKeyHandlers',
     value: function bindKeyHandlers() {
-      var _this8 = this;
+      var _this9 = this;
 
       Object.keys(GameView.MOVES).forEach(function (key) {
         var move = GameView.MOVES[key];
@@ -578,7 +603,7 @@ var GameView = function () {
       document.addEventListener('keydown', function (e) {
         if (e.key === " ") {
           e.preventDefault();
-          _this8.activateDireHit();
+          _this9.activateDireHit();
         }
       });
     }
@@ -626,7 +651,11 @@ GameView.MOVES = {
   "ArrowLeft": "left",
   "ArrowUp": "up",
   "ArrowRight": "right",
-  "ArrowDown": "down"
+  "ArrowDown": "down",
+  "a": "left",
+  "w": "up",
+  "d": "right",
+  "s": "down"
 };
 
 GameView.KEYS = {
@@ -689,8 +718,11 @@ var Player = function () {
       this.img = new Image();
 
       this.img.onload = function () {
-        _this.imgLoaded = true;
         _this.staticAssets.addLoadedImage(url, _this.img);
+
+        setTimeout(function () {
+          _this.imgLoaded = true;
+        }, Player.EVOLUTION_DURATION);
       };
 
       this.img.src = url;
@@ -790,6 +822,7 @@ Player.DIRE_HIT_COLOR = "#ff3d00";
 Player.SPIKES_COLOR = "#fffc00";
 Player.NORMAL_OUTLINE_WIDTH = 5;
 Player.DIRE_HIT_OUTLINE_WIDTH = 10;
+Player.EVOLUTION_DURATION = 100;
 
 exports.default = Player;
 

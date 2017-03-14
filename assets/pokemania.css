@@ -93,8 +93,7 @@ input[type="text"]:focus {
   transition: background 0.5s;
 }
 
-.restart-button {
-  justify-content: center;
+.restart-button, .main-menu-button {
   width: 80%;
   margin: 10px auto;
 }
@@ -108,8 +107,8 @@ input[type="text"]:focus {
   margin: 0 10px 0 15%;
 }
 
-.restart-button > img {
-  margin-left: 0;
+.restart-button > img, .main-menu-button > img {
+  margin-left: 15%;
 }
 
 .button:last-child {
@@ -222,7 +221,7 @@ a:hover {
     width: 100%;
   }
 
-  .restart-button {
+  .restart-button, .main-menu-button {
     width: 90%;
   }
 
@@ -265,6 +264,10 @@ a:hover {
   }
 
   #instructions-reminder {
+    font-size: 16px;
+  }
+
+  a {
     font-size: 16px;
   }
 }

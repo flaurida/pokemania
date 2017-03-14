@@ -25,8 +25,12 @@ class Player {
     this.img = new Image();
 
     this.img.onload = () => {
-      this.imgLoaded = true;
       this.staticAssets.addLoadedImage(url, this.img);
+
+      setTimeout(
+        () => { this.imgLoaded = true; },
+        Player.EVOLUTION_DURATION
+      );
     };
 
     this.img.src = url;
@@ -150,5 +154,6 @@ Player.DIRE_HIT_COLOR = "#ff3d00";
 Player.SPIKES_COLOR = "#fffc00";
 Player.NORMAL_OUTLINE_WIDTH = 5;
 Player.DIRE_HIT_OUTLINE_WIDTH = 10;
+Player.EVOLUTION_DURATION = 100;
 
 export default Player;
