@@ -80,11 +80,14 @@ class Sockets {
 
   onMovePlayer(data) {
     if (!this.game) return;
+    
     const player = this.game.findHumanPlayer(data.id);
     if (player) player.power(data.impulses);
   }
 
   onDireHitPlayer(data) {
+    if (!this.game) return;
+
     const player = this.game.findHumanPlayer(data.id);
     if (player && !player.activatingDireHit) {
       player.activateDireHit();
