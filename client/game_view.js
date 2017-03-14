@@ -287,7 +287,7 @@ class GameView {
 
   handleInactivity(data) {
     if (data.id === this.currentPlayerId) {
-      this.playStatus === "restart";
+      this.playStatus = "restart";
       this.activateScreen("inactive");
     }
   }
