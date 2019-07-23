@@ -2,7 +2,7 @@
 
 [Live Version](http://www.pokemania.site)
 
-Pokemania is a multiplayer Javascript game built with a Node.js server and Socket.IO to provide real time updates.
+Pokemania is a multiplayer Javascript game built with a Node.js server and Socket.IO to provide real time updates!
 
 The objective of the game is simple: get as large as you can and don't lose. Your player becomes larger and evolves by defeating other Pokemon. You can defeat another Pokemon if they are smaller than you, or if you activate Dire Hit and run into a larger Pokemon. However, there is a delay for Dire Hit to take effect that gets longer as you grow and evolve. Controls are arrow keys to move and space bar to activate Dire Hit.
 
@@ -12,12 +12,12 @@ The objective of the game is simple: get as large as you can and don't lose. You
 
 The basic game logic is handled on a server written with Node.js. This takes care of a few basic operations:
 
-* Creating new players (both human and computer)
-* Updating player positions based on their velocities
-* Handling collisions
-* Handling out of bounds players
-* Removing inactive human players
-* Refilling the game with computer players if needed
+- Creating new players (both human and computer)
+- Updating player positions based on their velocities
+- Handling collisions
+- Handling out of bounds players
+- Removing inactive human players
+- Refilling the game with computer players if needed
 
 This basic game logic lives in the [game file in the server folder](./server/game.js).
 
@@ -57,6 +57,7 @@ notifyInactivePlayers(inactivePlayerIds) {
   });
 }
 ```
+
 ### Connecting the Client
 
 When a new client visits the site, I set up the canvas to draw the game on, connect to the server using the Socket.IO API, and initialize a new instance of the [GameView class](client/game_view.js). This allows the server to communicate updates with the client and for the client to see the effects in the browser.
@@ -137,6 +138,6 @@ addImage(url) {
 
 ### Future Directions
 
-* Improve compatibility with Safari and IE
-* Garbage collection on client side when players lose
-* Multiple servers if the game gets too full
+- Improve compatibility with Safari and IE
+- Garbage collection on client side when players lose
+- Multiple servers if the game gets too full
